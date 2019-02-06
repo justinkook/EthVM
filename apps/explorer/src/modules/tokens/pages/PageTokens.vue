@@ -1,23 +1,46 @@
 <template>
-  <v-container grid-list-lg class="mb-0">
-    <app-bread-crumbs :new-items="crumbs" />
-    <table-tokens :tokens="tokens" />
+  <v-container v-if="!hasError" grid-list-lg class="mb-0">
+    <!--
+    =====================================================================================
+      ERROR
+    =====================================================================================
+    -->
+    <div v-if="hasError">
+      <app-error :message="error" />
+    </div>
+    <!--
+    =====================================================================================
+      DETAILS
+    =====================================================================================
+    -->
+    <div v-if="!hasError">
+      <app-loading :isLoading="isLoading">
+        <app-bread-crumbs :new-items="crumbs" />
+        <table-tokens :tokens="tokens" />
+      </app-loading>
+    </div>
   </v-container>
 </template>
 
 <script lang="ts">
+import AppError from '@app/core/components/ui/AppError.vue'
+import AppLoading from '@app/core/components/ui/AppLoading.vue'
 import AppBreadCrumbs from '@app/core/components/ui/AppBreadCrumbs.vue'
 import TableTokens from '@app/modules/tokens/components/TableTokens.vue'
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
   components: {
+    AppError,
+    AppLoading,
     AppBreadCrumbs,
     TableTokens
   }
 })
 export default class PageTokens extends Vue {
-  tokens: any = []
+  tokens: any = [] // Array of tokens for table display
+  hasError = false // Boolean flag to determine whether or not there is an error to display
+  error = '' // Error message
 
   /*
   ===================================================================================
@@ -25,13 +48,8 @@ export default class PageTokens extends Vue {
   ===================================================================================
   */
 
-  async mounted() {
-    try {
-      this.tokens = await this.fetchTokens()
-      // this.tokens = await this.fetchTokenExchangeRates()
-    } catch (e) {
-      // handle error accordingly
-    }
+  mounted() {
+    this.fetchData()
   }
 
   /*
@@ -39,6 +57,23 @@ export default class PageTokens extends Vue {
     Methods
   ===================================================================================
   */
+
+  /**
+   * Fetch all data relevant to the view.
+   */
+  fetchData() {
+    const tokenPromise = this.fetchTokens()
+    const promises = [tokenPromise]
+
+    Promise.all(promises)
+      .then(([tokens]) => {
+        this.tokens = tokens as any[]
+      })
+      .catch(e => {
+        this.hasError = true
+        this.error = e
+      })
+  }
 
   /**
    * GET and return a JSON array of ETH-based tokens
@@ -50,10 +85,13 @@ export default class PageTokens extends Vue {
       this.$http
         .get('http://api.ethplorer.io/getTop?apiKey=freekey&criteria=cap')
         .then(response => {
+          if (response.data.error) {
+            return reject(response.data.error.message)
+          }
           resolve(response.data.tokens)
         })
         .catch(err => {
-          reject(err)
+          reject(err.data.error.message)
         })
     })
   }
@@ -95,6 +133,15 @@ export default class PageTokens extends Vue {
         disabled: true
       }
     ]
+  }
+
+  /**
+   * Determines whether or not all of the required objects have been loaded/populated
+   *
+   * @return {Boolean}
+   */
+  get isLoading() {
+    return this.tokens.length === 0
   }
 }
 </script>

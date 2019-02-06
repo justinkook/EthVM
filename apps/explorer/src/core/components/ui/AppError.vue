@@ -1,6 +1,13 @@
 <template>
   <v-card flat class="pa-5">
-    <v-card-text class="error--text text-xs-center body-2"> {{ messg }}</v-card-text>
+    <v-layout class="error--text display-2 justify-center align-center">
+      <i class="fas fa-exclamation-circle text-lg-center mr-3 mb-2"></i>
+      {{ errorText }}
+    </v-layout>
+    <v-layout class="justify-center"><img src="https://media.giphy.com/media/cegWQ66TiGYDK/giphy.gif"></v-layout>
+    <v-layout class="title justify-center">
+        <v-card-text class="title text-md-center">{{ message }}</v-card-text>
+    </v-layout>
   </v-card>
 </template>
 
@@ -9,46 +16,10 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 
 @Component
 export default class AppError extends Vue {
-  @Prop(String) pageType!: string
-  @Prop(String) reference!: string
-  @Prop({ type: Boolean, default: false }) serverError!: boolean
+  @Prop(String) message: string
 
-  //Computed:
-  get messg(): string {
-    return this.serverError
-      ? this.$i18n.t('message.error').toString()
-      : (
-          this.$i18n.t('message.notValid') +
-          this.types[this.pageType] +
-          ' ' +
-          this.$i18n
-            .t('common.hash')
-            .toString()
-            .toLowerCase() +
-          ' : ' +
-          this.reference
-        ).toString()
-  }
-
-  get types(): Object {
-    return {
-      address: this.$i18n
-        .t('title.address')
-        .toString()
-        .toLowerCase(),
-      token: this.$i18n
-        .t('tableHeader.token')
-        .toString()
-        .toLowerCase(),
-      block: this.$i18n
-        .t('kb.block.term')
-        .toString()
-        .toLowerCase(),
-      tx: this.$i18n
-        .t('kb.txs.term')
-        .toString()
-        .toLowerCase()
-    }
+  get errorText() {
+    return this.$i18n.t('message.err')
   }
 }
 </script>

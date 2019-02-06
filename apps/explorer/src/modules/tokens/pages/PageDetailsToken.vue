@@ -6,52 +6,38 @@
     =====================================================================================
     -->
     <div v-if="hasError">
-      <h1>ERROR: {{ error }}</h1>
+      <app-error :message="error" />
     </div>
     <!--
     =====================================================================================
       HOLDER DETAILS
     =====================================================================================
     -->
-    <div v-if="isHolder">
-      <div v-if="!isLoading && !isHolderDetailsLoading">
+    <div v-if="isHolder && !hasError">
+      <app-loading :isLoading="isLoading || isHolderDetailsLoading" >
         <app-bread-crumbs :new-items="crumbs" />
         <details-list-tokens-holder :contract="contract" :token="token" :holder="holderInfo" class="mb-5" />
-        <details-tabs-tokens-holder :transfers="holderTransactions" :address-ref="addressRef" />
-      </div>
-      <div v-else>
-        <v-layout v-if="!hasError" column align-center justify-center ma-3>
-          <v-card-title class="primary--text text-xs-center body-2 pb-4">Loading...</v-card-title>
-          <v-icon class="fa fa-spinner fa-pulse fa-4x fa-fw primary--text" large />
-        </v-layout>
-      </div>
+        <details-tabs-tokens-holder v-if="holderTransactions.length > 0" :transfers="holderTransactions" :address-ref="addressRef" />
+      </app-loading>
     </div>
     <!--
     =====================================================================================
       BASIC DETAILS
     =====================================================================================
     -->
-    <div v-else>
-      <!-- Loaded -->
-      <div v-if="!isLoading">
+    <div v-if="!isHolder && !hasError">
+      <app-loading :isLoading="isLoading" >
         <app-bread-crumbs :new-items="crumbs" />
         <details-list-tokens :contract="contract" :token="token" class="mb-5" />
         <details-tabs-tokens :transfers="temporaryTokenTransfers" :holders="tokenHolders" :address-ref="addressRef" />
-      </div>
-      <!-- End Loaded -->
-      <!-- Not Loaded -->
-      <div v-else>
-        <v-layout v-if="!hasError" column align-center justify-center ma-3>
-          <v-card-title class="primary--text text-xs-center body-2 pb-4">Loading...</v-card-title>
-          <v-icon class="fa fa-spinner fa-pulse fa-4x fa-fw primary--text" large />
-        </v-layout>
-      </div>
-      <!-- End Not Loaded -->
+      </app-loading>
     </div>
   </v-container>
 </template>
 
 <script lang="ts">
+import AppError from '@app/core/components/ui/AppError.vue'
+import AppLoading from '@app/core/components/ui/AppLoading.vue'
 import AppBreadCrumbs from '@app/core/components/ui/AppBreadCrumbs.vue'
 import AppSocialLink from '@app/core/components/ui/AppSocialLink.vue'
 import DetailsListTokens from '@app/modules/tokens/components/DetailsListTokens.vue'
@@ -67,6 +53,8 @@ const MAX_ITEMS = 10
 
 @Component({
   components: {
+    AppError,
+    AppLoading,
     AppBreadCrumbs,
     DetailsListTokens,
     DetailsListTokensHolder,
@@ -85,6 +73,7 @@ export default class PageDetailsToken extends Vue {
   isHolder = false // Whether or not "holder" is included in query params to display view accordingly
   holderAddress: any = '' // Address of current token holder, if applicable
   holderTransactions: any[] = [] // Transactions for a particular holder address
+  holderTransactionsLoading = true // Boolean flag to detect if holder transactions have been loaded
   holderInfo: any = {} // Balance/information for a particular holder address
   hasError = false // Boolean whether or not page has errors to display
   error = '' // Error message
@@ -107,6 +96,7 @@ export default class PageDetailsToken extends Vue {
     } else {
       this.isHolder = false
       this.holderTransactions = []
+      this.holderTransactionsLoading = false
       this.holderInfo = {}
     }
   }
@@ -124,6 +114,7 @@ export default class PageDetailsToken extends Vue {
   async fetchData() {
     const query = this.$route.query
     this.isHolder = false
+    this.holderTransactionsLoading = false
 
     this.fetchNormalData()
 
@@ -155,7 +146,7 @@ export default class PageDetailsToken extends Vue {
         .catch(e => {
           // Handle error accordingly
           this.hasError = true
-          this.error = 'Error loading data'
+          this.error = e
         })
     })
   }
@@ -178,13 +169,13 @@ export default class PageDetailsToken extends Vue {
         .then(([holderTransactions, holderInfo]) => {
           this.holderTransactions = holderTransactions as any[]
           this.holderInfo = holderInfo
-          // console.log(this.holderInfo)
+          this.holderTransactionsLoading = false
           resolve()
         })
         .catch(e => {
           // Handle error accordingly
           this.hasError = true
-          this.error = 'Error loading data'
+          this.error = e
         })
     })
   }
@@ -241,7 +232,7 @@ export default class PageDetailsToken extends Vue {
           resolve(response.data)
         })
         .catch(err => {
-          reject(err)
+          reject(err.data.error.message || err)
         })
     })
   }
@@ -262,7 +253,7 @@ export default class PageDetailsToken extends Vue {
           resolve(response.data.holders)
         })
         .catch(err => {
-          reject(err)
+          reject(err.data.error.message || err)
         })
     })
   }
@@ -283,7 +274,7 @@ export default class PageDetailsToken extends Vue {
           resolve(response.data)
         })
         .catch(err => {
-          reject(err)
+          reject(err.data.error.message || err)
         })
     })
   }
@@ -304,7 +295,7 @@ export default class PageDetailsToken extends Vue {
           resolve(response.data.operations)
         })
         .catch(err => {
-          reject(err)
+          reject(err.data.error.message || err)
         })
     })
   }
@@ -409,7 +400,7 @@ export default class PageDetailsToken extends Vue {
    * @return {Boolean}
    */
   get isHolderTransactionsLoading(): boolean {
-    return this.holderTransactions.length === 0
+    return this.holderTransactionsLoading // this.holderTransactions.length === 0
   }
 
   /**

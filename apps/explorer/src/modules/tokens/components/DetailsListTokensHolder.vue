@@ -79,7 +79,7 @@ export default class DetailsListTokens extends Vue {
       },
       {
         title: this.$i18n.t('token.balance').toString(),
-        detail: this.holder.tokens[0].balance
+        detail: this.holder.tokens ? this.holder.tokens[0].balance : 'N/A'
       },
       {
         title: `${this.$i18n.t('token.balance').toString()} (USD)`,
@@ -101,7 +101,7 @@ export default class DetailsListTokens extends Vue {
   }
 
   get balanceUsd() {
-    return this.token.price.rate * this.holder.tokens[0].balance
+    return this.holder.tokens ? this.token.price.rate * this.holder.tokens[0].balance : 'N/A'
   }
 }
 </script>
