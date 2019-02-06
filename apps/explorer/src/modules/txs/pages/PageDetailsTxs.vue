@@ -1,20 +1,37 @@
 <template>
   <v-container grid-list-lg class="mb-0">
     <app-bread-crumbs :new-items="crumbs" />
-    <v-layout v-if="!error && tx" row wrap justify-start class="mb-4">
-      <v-flex xs12>
-        <app-list-details :items="txDetails" :more-items="txMoreDetails" :details-type="listType" :loading="loading">
-          <app-list-title slot="details-title" :list-type="listType" />
-        </app-list-details>
-      </v-flex>
-    </v-layout>
-    <app-error v-else :page-type="listType" :reference="txRef" />
+    <!--
+    =====================================================================================
+      ERROR
+    =====================================================================================
+    -->
+    <div v-if="hasError">
+      <app-error :message="error" />
+    </div>
+    <!--
+    =====================================================================================
+      DETAILS
+    =====================================================================================
+    -->
+    <div v-if="!hasError">
+      <app-loading :isLoading="isLoading" >
+        <v-layout row wrap justify-start class="mb-4">
+          <v-flex xs12>
+            <app-list-details :items="txDetails" :more-items="txMoreDetails" :details-type="listType" :loading="loading">
+              <app-list-title slot="details-title" :list-type="listType" />
+            </app-list-details>
+          </v-flex>
+        </v-layout>
+      </app-loading>
+    </div>
   </v-container>
 </template>
 
 <script lang="ts">
 import AppBreadCrumbs from '@app/core/components/ui/AppBreadCrumbs.vue'
 import AppError from '@app/core/components/ui/AppError.vue'
+import AppLoading from '@app/core/components/ui/AppLoading.vue'
 import AppListDetails from '@app/core/components/ui/AppListDetails.vue'
 import AppListTitle from '@app/core/components/ui/AppListTitle.vue'
 import { Events } from 'ethvm-common'
@@ -27,6 +44,7 @@ import { Detail } from '@app/core/components/props'
   components: {
     AppBreadCrumbs,
     AppError,
+    AppLoading,
     AppListDetails,
     AppListTitle
   }
@@ -35,7 +53,8 @@ export default class PageDetailsTxs extends Vue {
   @Prop({ type: String }) txRef!: string
 
   loading = true
-  error = false
+  hasError = false
+  error = ''
   listType = 'tx'
 
   transaction = null
@@ -49,7 +68,8 @@ export default class PageDetailsTxs extends Vue {
 
     // 1. Check that current tx ref is valid one
     if (!eth.isValidHash(ref)) {
-      this.error = true
+      this.hasError = true
+      this.error = this.$i18n.t('message.invalidHash').toString()
       return
     }
 
@@ -64,12 +84,15 @@ export default class PageDetailsTxs extends Vue {
     }
   }
 
-  //Methods:
+  // Methods:
   fetchTx() {
     this.$api
       .getTx(this.txRef)
       .then(tx => this.setTxInfo(tx))
-      .catch(err => (this.error = true))
+      .catch(err => {
+        this.hasError = true
+        this.error = this.$i18n.t('message.notValid').toString() + this.$i18n.t('search.addressTx').toString()
+      })
   }
 
   setTxInfo(tx: Tx) {
@@ -170,6 +193,10 @@ export default class PageDetailsTxs extends Vue {
 
   get formatTime(): string {
     return new Date(this.timestamp).toString()
+  }
+
+  get isLoading() {
+    return !this.tx
   }
 
   get crumbs() {

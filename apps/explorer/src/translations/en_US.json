@@ -104,7 +104,8 @@
     "loadingBlockTx": "Loading block transactions",
     "notMined": "This block has not been mined yet",
     "noTx": "This Transaction does not exist",
-    "notValid": "This is not a valid "
+    "notValid": "Invalid ",
+    "invalidHash": "Invalid hash"
   },
   "block": {
     "height": "Height",
