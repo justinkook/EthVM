@@ -1,45 +1,28 @@
 <template>
-  <v-container grid-list-lg>
-    <!--
-    =====================================================================================
-      ERROR
-    =====================================================================================
-    -->
-    <div v-if="hasError">
-      <app-error :message="error" />
-    </div>
+  <app-page-base :has-error="hasError" :error-message="error" :crumbs="crumbs" :is-loading="isLoading">
     <!--
     =====================================================================================
       HOLDER DETAILS
     =====================================================================================
     -->
-    <div v-if="isHolder && !hasError">
-      <app-loading :isLoading="isLoading || isHolderDetailsLoading" >
-        <app-bread-crumbs :new-items="crumbs" />
-        <details-list-tokens-holder :contract="contract" :token="token" :holder="holderInfo" class="mb-5" />
-        <details-tabs-tokens-holder v-if="holderTransactions.length > 0" :transfers="holderTransactions" :address-ref="addressRef" />
-      </app-loading>
+    <div v-if="isHolder">
+      <details-list-tokens-holder :contract="contract" :token="token" :holder="holderInfo" class="mb-5" />
+      <details-tabs-tokens-holder v-if="holderTransactions.length > 0" :transfers="holderTransactions" :address-ref="addressRef" />
     </div>
     <!--
     =====================================================================================
       BASIC DETAILS
     =====================================================================================
     -->
-    <div v-if="!isHolder && !hasError">
-      <app-loading :isLoading="isLoading" >
-        <app-bread-crumbs :new-items="crumbs" />
-        <details-list-tokens :contract="contract" :token="token" class="mb-5" />
-        <details-tabs-tokens :transfers="temporaryTokenTransfers" :holders="tokenHolders" :address-ref="addressRef" />
-      </app-loading>
+    <div v-if="!isHolder">
+      <details-list-tokens :contract="contract" :token="token" class="mb-5" />
+      <details-tabs-tokens :transfers="temporaryTokenTransfers" :holders="tokenHolders" :address-ref="addressRef" />
     </div>
-  </v-container>
+  </app-page-base>
 </template>
 
 <script lang="ts">
-import AppError from '@app/core/components/ui/AppError.vue'
-import AppLoading from '@app/core/components/ui/AppLoading.vue'
-import AppBreadCrumbs from '@app/core/components/ui/AppBreadCrumbs.vue'
-import AppSocialLink from '@app/core/components/ui/AppSocialLink.vue'
+import AppPageBase from '@app/core/components/ui/AppPageBase.vue'
 import DetailsListTokens from '@app/modules/tokens/components/DetailsListTokens.vue'
 import DetailsListTokensHolder from '@app/modules/tokens/components/DetailsListTokensHolder.vue'
 import DetailsTabsTokens from '@app/modules/tokens/components/DetailsTabsTokens.vue'
@@ -53,9 +36,7 @@ const MAX_ITEMS = 10
 
 @Component({
   components: {
-    AppError,
-    AppLoading,
-    AppBreadCrumbs,
+    AppPageBase,
     DetailsListTokens,
     DetailsListTokensHolder,
     DetailsTabsTokens,
@@ -268,6 +249,7 @@ export default class PageDetailsToken extends Vue {
       this.$http
         .get(`http://api.ethplorer.io/getAddressInfo/${this.holderAddress}?apiKey=freekey&token=${this.addressRef}`)
         .then(response => {
+          console.log('info', response)
           if (response.data.error) {
             return reject(response.data.error.message)
           }
@@ -289,6 +271,7 @@ export default class PageDetailsToken extends Vue {
       this.$http
         .get(`http://api.ethplorer.io/getAddressHistory/${this.holderAddress}?apiKey=freekey&token=${this.addressRef}&type=transfer`)
         .then(response => {
+          console.log('trans', response)
           if (response.data.error) {
             return reject(response.data.error.message)
           }
@@ -413,21 +396,30 @@ export default class PageDetailsToken extends Vue {
   }
 
   /**
-   * Determines whether or not all of the required objects have been loaded/populated
-   *
-   * @return {Boolean}
-   */
-  get isLoading(): boolean {
-    return this.isContractLoading || this.isTokenLoading || this.isTransfersLoading || this.isHoldersLoading
-  }
-
-  /**
    * Determines whether or not all of the required/additional holder objects have been loaded/populated
    *
    * @return {Boolean}
    */
   get isHolderDetailsLoading(): boolean {
     return this.isHolderTransactionsLoading || this.isHolderInfoLoading
+  }
+
+  /**
+   * Determines whether or not all of the required objects for a "basic" (not holder) view have been loaded/populated
+   *
+   * @return {Boolean}
+   */
+  get isBasicDetailsLoading(): boolean {
+    return this.isContractLoading || this.isTokenLoading || this.isTransfersLoading || this.isHoldersLoading
+  }
+
+  /**
+   * Determines whether or not all of the required objects have been loaded/populated
+   *
+   * @return {Boolean}
+   */
+  get isLoading(): boolean {
+    return this.isHolder ? this.isHolderDetailsLoading || this.isBasicDetailsLoading : this.isBasicDetailsLoading
   }
 
   /*

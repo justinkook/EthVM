@@ -1,39 +1,17 @@
 <template>
-  <v-container v-if="!hasError" grid-list-lg class="mb-0">
-    <!--
-    =====================================================================================
-      ERROR
-    =====================================================================================
-    -->
-    <div v-if="hasError">
-      <app-error :message="error" />
-    </div>
-    <!--
-    =====================================================================================
-      DETAILS
-    =====================================================================================
-    -->
-    <div v-if="!hasError">
-      <app-loading :isLoading="isLoading">
-        <app-bread-crumbs :new-items="crumbs" />
-        <table-tokens :tokens="tokens" />
-      </app-loading>
-    </div>
-  </v-container>
+  <app-page-base :has-error="hasError" :error-message="error" :crumbs="crumbs" :is-loading="isLoading">
+    <table-tokens :tokens="tokens" />
+  </app-page-base>
 </template>
 
 <script lang="ts">
-import AppError from '@app/core/components/ui/AppError.vue'
-import AppLoading from '@app/core/components/ui/AppLoading.vue'
-import AppBreadCrumbs from '@app/core/components/ui/AppBreadCrumbs.vue'
+import AppPageBase from '@app/core/components/ui/AppPageBase.vue'
 import TableTokens from '@app/modules/tokens/components/TableTokens.vue'
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
   components: {
-    AppError,
-    AppLoading,
-    AppBreadCrumbs,
+    AppPageBase,
     TableTokens
   }
 })

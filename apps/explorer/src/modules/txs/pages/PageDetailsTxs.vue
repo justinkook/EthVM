@@ -15,7 +15,7 @@
     =====================================================================================
     -->
     <div v-if="!hasError">
-      <app-loading :isLoading="isLoading" >
+      <app-loading :isLoading="is-loading" >
         <v-layout row wrap justify-start class="mb-4">
           <v-flex xs12>
             <app-list-details :items="txDetails" :more-items="txMoreDetails" :details-type="listType" :loading="loading">
