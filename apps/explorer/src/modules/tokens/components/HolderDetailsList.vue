@@ -27,10 +27,11 @@ import AppDetailsList from '@app/core/components/ui/AppDetailsList.vue'
     AppDetailsList
   }
 })
-export default class TokenDetailsList extends Vue {
+export default class HolderDetailsList extends Vue {
   @Prop(String) addressRef: string // Token contract address
   @Prop(Object) contractDetails: any
   @Prop(Object) tokenDetails: any
+  @Prop(Object) holderDetails: any
   @Prop(Boolean) isLoading: boolean
   @Prop(String) error: string
 
@@ -56,12 +57,11 @@ export default class TokenDetailsList extends Vue {
    * @return {String} - Title for details list
    */
   get title() {
-    return `${this.tokenDetails.name} (${this.tokenDetails.symbol})`
+    return `${this.tokenDetails.name} (${this.tokenDetails.symbol}) - Filtered by Holder`
   }
 
   /**
-   * Properly format the Details[] array for the details table.
-   * If the data hasn't been loaded yet, then only include the titles in the details.
+   * Properly format the Details[] array for the details table
    */
   get details(): Detail[] {
     const icons = {
@@ -83,96 +83,66 @@ export default class TokenDetailsList extends Vue {
     if (this.isLoading) {
       details = [
         {
+          title: this.$i18n.t('token.holder').toString()
+        },
+        {
           title: this.$i18n.t('title.contract').toString()
         },
         {
-          title: this.$i18n.t('token.owner').toString()
+          title: this.$i18n.t('token.balance').toString()
         },
         {
-          title: this.$i18n.t('title.supply').toString()
+          title: `${this.$i18n.t('token.balance').toString()} (USD)`
         },
         {
-          title: this.$i18n.t('title.price').toString()
+          title: this.$i18n.t('token.transfers').toString()
         },
         {
           title: this.$i18n.t('title.marketCap').toString()
         },
         {
-          title: this.$i18n.t('token.totalHold').toString()
-        },
-        {
           title: this.$i18n.t('title.decimals').toString()
-        },
-        {
-          title: this.$i18n.t('title.website').toString()
-        },
-        {
-          title: this.$i18n.t('title.support').toString()
-        },
-        {
-          title: this.$i18n.t('title.links').toString()
         }
       ]
     } else {
       details = [
         {
+          title: this.$i18n.t('token.holder').toString(),
+          detail: this.$route.query.holder,
+          link: `/address/${this.$route.query.holder}`
+        },
+        {
           title: this.$i18n.t('title.contract').toString(),
           detail: this.tokenDetails.address,
-          link: this.token ? `/address/${this.tokenDetails.address}` : ''
+          link: `/address/${this.tokenDetails.address}`
         },
         {
-          title: this.$i18n.t('token.owner').toString(),
-          detail: this.tokenDetails.owner,
-          link: `/address/${this.tokenDetails.owner}`
+          title: this.$i18n.t('token.balance').toString(),
+          detail: this.holderDetails.tokens ? this.holderDetails.tokens[0].balance : 'N/A'
         },
         {
-          title: this.$i18n.t('title.supply').toString(),
-          detail: this.tokenDetails.totalSupply
+          title: `${this.$i18n.t('token.balance').toString()} (USD)`,
+          detail: this.balanceUsd
         },
         {
-          title: this.$i18n.t('title.price').toString(),
-          detail: `$${this.tokenDetails.price.rate} (${this.tokenDetails.price.diff}%)`
+          title: this.$i18n.t('token.transfers').toString(),
+          detail: this.holderDetails.countTxs
         },
         {
           title: this.$i18n.t('title.marketCap').toString(),
           detail: `$${this.tokenDetails.price.marketCapUsd}`
         },
         {
-          title: this.$i18n.t('token.totalHold').toString(),
-          detail: `${this.tokenDetails.holdersCount}`
-        },
-        {
           title: this.$i18n.t('title.decimals').toString(),
           detail: this.contractDetails.metadata.decimals
-        },
-        {
-          title: this.$i18n.t('title.website').toString(),
-          detail: `<a href="${this.contractDetails.metadata.website}" target="_BLANK">${this.contractDetails.metadata.website}</a>`
-        },
-        {
-          title: this.$i18n.t('title.support').toString(),
-          detail: `<a href="mailto:${this.contractDetails.metadata.support.email}" target="_BLANK">${this.contractDetails.metadata.support.email}</a>`
-        },
-        {
-          title: this.$i18n.t('title.links').toString(),
-          detail: Object.entries(this.contractDetails.metadata.social)
-            .map(obj => {
-              const name = obj[0]
-              const url = obj[1]
-              if (url === null || url === '') {
-                return ''
-              }
-              return `<a href="${url}" target="_BLANK"><i aria-hidden="true" class="v-icon secondary--text ${
-                icons[name]
-              } pr-2 material-icons theme--light"></i></a>`
-            })
-            .reduce((a, b) => {
-              return `${a}${b}`
-            })
         }
       ]
     }
     return details
+  }
+
+  get balanceUsd() {
+    return this.holderDetails.tokens ? this.tokenDetails.price.rate * this.holderDetails.tokens[0].balance : 'N/A'
   }
 }
 </script>

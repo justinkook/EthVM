@@ -98,8 +98,8 @@ export default class HolderTableTokens extends Vue {
    * @return {String} - Pagination text
    */
   get paginationText() {
-    const start = (this.page - 1) * MAX_ITEMS + 1
-    const end = start + this.holdersPage.length - 1
+    const start = this.holders.length > 0 ? (this.page - 1) * MAX_ITEMS + 1 : 0
+    const end = this.holders.length > 0 ? start + this.holdersPage.length - 1 : 0
     return `Showing results ${start} - ${end} of ${this.holders.length}`
   }
 }

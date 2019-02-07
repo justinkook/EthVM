@@ -117,8 +117,8 @@ export default class TransferTableTokens extends Vue {
    * @return {String} - Pagination text
    */
   get paginationText() {
-    const start = (this.page - 1) * MAX_ITEMS + 1
-    const end = start + this.transfersPage.length - 1
+    const start = this.transfers.length > 0 ? (this.page - 1) * MAX_ITEMS + 1 : 0
+    const end = this.transfers.length > 0 ? start + this.transfersPage.length - 1 : 0
     return `Showing results ${start} - ${end} of ${this.transfers.length}`
   }
 }
