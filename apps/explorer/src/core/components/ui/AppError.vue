@@ -4,7 +4,7 @@
       <v-layout class="error--text display-2 justify-center align-center">
         <i class="fas fa-exclamation-circle text-lg-center mr-3 mb-2"></i>{{ errorText }}
       </v-layout>
-      <v-layout class="justify-center"><img src="https://media.giphy.com/media/cegWQ66TiGYDK/giphy.gif"/></v-layout>
+      <!-- <v-layout class="justify-center"><img src="https://media.giphy.com/media/cegWQ66TiGYDK/giphy.gif"/></v-layout> -->
       <v-layout class="title justify-center">
         <v-card-text class="title text-md-center">{{ message }}</v-card-text>
       </v-layout>

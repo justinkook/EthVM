@@ -1,99 +1,58 @@
 <template>
-  <v-card color="white" flat>
-    <!--
-    =====================================================================================
-      ERROR
-    =====================================================================================
-    -->
-    <!-- <app-error :has-error="hasError" :message="error" /> -->
-    <!--
-    =====================================================================================
-      TITLE
-    =====================================================================================
-    -->
-    <div v-if="isLoading">
-      <v-card-title class="title font-weight-bold pl-4">
-        <div style="width: 300px; height: 20px; background: #e6e6e6; border-radius: 2px;"></div>
-      </v-card-title>
-    </div>
-    <div v-else>
-      <v-card-title class="title font-weight-bold pl-4">{{ tokenDetails.name }} ({{ tokenDetails.symbol }})</v-card-title>
-      <v-divider class="lineGrey" />
-    </div>
-    <!--
-    =====================================================================================
-      LOADING
-    =====================================================================================
-    -->
-    <v-progress-linear color="blue" indeterminate v-if="isLoading" />
-    <!--
-    =====================================================================================
-      DETAILS
-    =====================================================================================
-    -->
-    <v-list-tile v-for="(item, index) in details" :key="index">
-      <v-layout align-center justify-start row fill-height class="pa-3">
-        <!-- Detail Title -->
-        <v-flex xs4 sm3 md2>
-          <div class="info--text font-weight-medium" v-html="item.title" />
-        </v-flex>
-        <!-- Detail Info -->
-        <v-flex xs7 sm8 md9>
-          <div v-if="isLoading">
-            <v-flex xs12 style="background: #e6e6e6; height: 12px; border-radius: 2px;"></v-flex>
-          </div>
-          <div v-else>
-            <div v-if="!item.link" class="text-muted text-truncate" v-html="item.detail"></div>
-            <router-link v-else :to="item.link">
-              <div class="text-truncate" v-html="item.detail"></div>
-            </router-link>
-          </div>
-        </v-flex>
-      </v-layout>
-    </v-list-tile>
-  </v-card>
+  <div>
+    <app-error :has-error="hasError" :message="error" />
+    <app-details-list
+      v-if="!hasError"
+      :title="title"
+      :details="details"
+      :is-loading="isLoading"
+    />
+  </div>
 </template>
 
 <script lang="ts">
 import { Detail } from '@app/core/components/props'
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import AppError from '@app/core/components/ui/AppError.vue'
+import AppDetailsList from '@app/core/components/ui/AppDetailsList.vue'
 
 @Component({
   components: {
-    AppError
+    AppError,
+    AppDetailsList
   }
 })
-export default class DetailsListTokens extends Vue {
+export default class TokenDetailsList extends Vue {
   @Prop(String) addressRef: string // Token contract address
   @Prop(Object) contractDetails: any
   @Prop(Object) tokenDetails: any
   @Prop(Boolean) isLoading: boolean
-  @Prop(Object) error: any
+  @Prop(String) error: string
 
-  contract: any = {} // Contract details object
-  token: any = {} // Token details object
-
-  /*
-  ===================================================================================
-    Lifecycle
-  ===================================================================================
-  */
-
-  async mounted() {
-    
-  }
-
-  /*
-  ===================================================================================
-    Methods
-  ===================================================================================
-  */
   /*
   ===================================================================================
     Computed Values
   ===================================================================================
   */
+
+  /**
+   * Determines whether or not component has an error.
+   * If error property is empty string, there is no error.
+   *
+   * @return {Boolean} - Whether or not error exists
+   */
+  get hasError(): boolean {
+    return this.error !== ''
+  }
+
+  /**
+   * Create properly-formatted title from tokenDetails
+   *
+   * @return {String} - Title for details list
+   */
+  get title() {
+    return `${this.tokenDetails.name} (${this.tokenDetails.symbol})`
+  }
 
   /**
    * Properly format the Details[] array for the details table.
@@ -122,7 +81,7 @@ export default class DetailsListTokens extends Vue {
           title: this.$i18n.t('title.contract').toString()
         },
         {
-          title: this.$i18n.t('tokenDetails.owner').toString()
+          title: this.$i18n.t('token.owner').toString()
         },
         {
           title: this.$i18n.t('title.supply').toString()
@@ -134,7 +93,7 @@ export default class DetailsListTokens extends Vue {
           title: this.$i18n.t('title.marketCap').toString()
         },
         {
-          title: this.$i18n.t('tokenDetails.totalHold').toString()
+          title: this.$i18n.t('token.totalHold').toString()
         },
         {
           title: this.$i18n.t('title.decimals').toString()
@@ -157,7 +116,7 @@ export default class DetailsListTokens extends Vue {
           link: this.token ? `/address/${this.tokenDetails.address}` : ''
         },
         {
-          title: this.$i18n.t('tokenDetails.owner').toString(),
+          title: this.$i18n.t('token.owner').toString(),
           detail: this.tokenDetails.owner,
           link: `/address/${this.tokenDetails.owner}`
         },
@@ -174,7 +133,7 @@ export default class DetailsListTokens extends Vue {
           detail: `$${this.tokenDetails.price.marketCapUsd}`
         },
         {
-          title: this.$i18n.t('tokenDetails.totalHold').toString(),
+          title: this.$i18n.t('token.totalHold').toString(),
           detail: `${this.tokenDetails.holdersCount}`
         },
         {
