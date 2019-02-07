@@ -8,7 +8,6 @@
 
 <script lang="ts">
 import AppBreadCrumbs from '@app/core/components/ui/AppBreadCrumbs.vue'
-import AppPageBase from '@app/core/components/ui/AppPageBase.vue'
 import DetailsListTokens from '@app/modules/tokens/components/DetailsListTokens.vue'
 import DetailsListTokensHolder from '@app/modules/tokens/components/DetailsListTokensHolder.vue'
 import DetailsTabsTokens from '@app/modules/tokens/components/DetailsTabsTokens.vue'
@@ -23,7 +22,6 @@ const MAX_ITEMS = 10
 @Component({
   components: {
     AppBreadCrumbs,
-    AppPageBase,
     DetailsListTokens,
     DetailsListTokensHolder,
     DetailsTabsTokens,

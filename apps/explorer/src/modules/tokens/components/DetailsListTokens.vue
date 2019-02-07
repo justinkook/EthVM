@@ -2,6 +2,12 @@
   <v-card color="white" flat>
     <!--
     =====================================================================================
+      ERROR
+    =====================================================================================
+    -->
+    <!-- <app-error :has-error="hasError" :message="error" /> -->
+    <!--
+    =====================================================================================
       TITLE
     =====================================================================================
     -->
@@ -51,13 +57,20 @@
 <script lang="ts">
 import { Detail } from '@app/core/components/props'
 import { Component, Vue, Prop } from 'vue-property-decorator'
+import AppError from '@app/core/components/ui/AppError.vue'
 
-@Component
+@Component({
+  components: {
+    AppError
+  }
+})
 export default class DetailsListTokens extends Vue {
   @Prop(String) addressRef: string // Token contract address
 
   contract: any = {} // Contract details object
   token: any = {} // Token details object
+  hasError = false
+  error = ''
 
   /*
   ===================================================================================
@@ -71,6 +84,8 @@ export default class DetailsListTokens extends Vue {
       this.token = await this.fetchTokenDetails()
     } catch (e) {
       // Handle error
+      this.hasError = true
+      this.error = `${e}`
     }
   }
 

@@ -16,7 +16,7 @@
     -->
     <v-tab-item slot="tabs-item" value="tab-1">
       <v-progress-linear color="blue" indeterminate v-if="isHoldersLoading" class="mt-0" />
-      <holder-table-tokens :holders="holders" :address-ref="addressRef" />
+      <holder-table-tokens :holders="holders" :address-ref="addressRef" v-if="!isHoldersLoading" />
     </v-tab-item>
   </app-tabs>
 </template>
