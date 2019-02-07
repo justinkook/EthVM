@@ -142,7 +142,7 @@ export default class PageDetailsToken extends Vue {
       this.holderTransfers = []
       this.holderTransfersLoading = false
     }
-    window.scrollTo(0,0)
+    window.scrollTo(0, 0)
   }
 
   /*

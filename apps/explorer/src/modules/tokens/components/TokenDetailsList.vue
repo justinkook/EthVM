@@ -56,6 +56,7 @@ export default class TokenDetailsList extends Vue {
    * @return {String} - Title for details list
    */
   get title() {
+    // <img src="${this.contractDetails.metadata.logo.src}" /> 
     return `${this.tokenDetails.name} (${this.tokenDetails.symbol})`
   }
 
