@@ -1,27 +1,13 @@
 <template>
-  <app-page-base :has-error="hasError" :error-message="error" :crumbs="crumbs" :is-loading="isLoading">
-    <!--
-    =====================================================================================
-      HOLDER DETAILS
-    =====================================================================================
-    -->
-    <div v-if="isHolder">
-      <details-list-tokens-holder :contract="contract" :token="token" :holder="holderInfo" class="mb-5" />
-      <details-tabs-tokens-holder v-if="holderTransactions.length > 0" :transfers="holderTransactions" :address-ref="addressRef" />
-    </div>
-    <!--
-    =====================================================================================
-      BASIC DETAILS
-    =====================================================================================
-    -->
-    <div v-if="!isHolder">
-      <details-list-tokens :contract="contract" :token="token" class="mb-5" />
-      <details-tabs-tokens :transfers="temporaryTokenTransfers" :holders="tokenHolders" :address-ref="addressRef" />
-    </div>
-  </app-page-base>
+  <v-container grid-list-lg>
+    <app-bread-crumbs :new-items="crumbs" />
+    <details-list-tokens :address-ref="addressRef" class="mb-5" />
+    <details-tabs-tokens :address-ref="addressRef" />
+  </v-container>
 </template>
 
 <script lang="ts">
+import AppBreadCrumbs from '@app/core/components/ui/AppBreadCrumbs.vue'
 import AppPageBase from '@app/core/components/ui/AppPageBase.vue'
 import DetailsListTokens from '@app/modules/tokens/components/DetailsListTokens.vue'
 import DetailsListTokensHolder from '@app/modules/tokens/components/DetailsListTokensHolder.vue'
@@ -36,6 +22,7 @@ const MAX_ITEMS = 10
 
 @Component({
   components: {
+    AppBreadCrumbs,
     AppPageBase,
     DetailsListTokens,
     DetailsListTokensHolder,
@@ -66,7 +53,7 @@ export default class PageDetailsToken extends Vue {
   */
 
   mounted() {
-    this.fetchData()
+    // this.fetchData()
   }
 
   @Watch('$route', { deep: true })
@@ -249,7 +236,6 @@ export default class PageDetailsToken extends Vue {
       this.$http
         .get(`http://api.ethplorer.io/getAddressInfo/${this.holderAddress}?apiKey=freekey&token=${this.addressRef}`)
         .then(response => {
-          console.log('info', response)
           if (response.data.error) {
             return reject(response.data.error.message)
           }
@@ -271,7 +257,6 @@ export default class PageDetailsToken extends Vue {
       this.$http
         .get(`http://api.ethplorer.io/getAddressHistory/${this.holderAddress}?apiKey=freekey&token=${this.addressRef}&type=transfer`)
         .then(response => {
-          console.log('trans', response)
           if (response.data.error) {
             return reject(response.data.error.message)
           }
@@ -332,7 +317,7 @@ export default class PageDetailsToken extends Vue {
           disabled: false
         },
         {
-          text: this.token.symbol,
+          text: this.addressRef, // this.token.symbol,
           link: `/token/${this.addressRef}`,
           disabled: true
         }
