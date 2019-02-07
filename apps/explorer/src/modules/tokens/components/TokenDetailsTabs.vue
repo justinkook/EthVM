@@ -8,7 +8,7 @@
     <v-tab-item slot="tabs-item" value="tab-0">
       <v-progress-linear color="blue" indeterminate v-if="isTokenTransfersLoading" class="mt-0" />
       <app-error :has-error="hasErrorTokenTransfers" :message="errorTokenTransfers" />
-      <transfer-table-tokens 
+      <token-table-transfers 
         v-if="!isTokenTransfersLoading && !hasErrorTokenTransfers" 
         :transfers="tokenTransfers" 
        />
@@ -20,7 +20,7 @@
     -->
     <v-tab-item slot="tabs-item" value="tab-1">
       <v-progress-linear color="blue" indeterminate v-if="isTokenHoldersLoading" class="mt-0" />
-      <holder-table-tokens 
+      <token-table-holders 
         v-if="!isTokenHoldersLoading" 
         :holders="tokenHolders"
         :address-ref="addressRef"
@@ -32,8 +32,8 @@
 <script lang="ts">
 import AppTabs from '@app/core/components/ui/AppTabs.vue'
 import AppError from '@app/core/components/ui/AppError.vue'
-import TransferTableTokens from '@app/modules/tokens/components/TransferTableTokens.vue'
-import HolderTableTokens from '@app/modules/tokens/components/HolderTableTokens.vue'
+import TokenTableTransfers from '@app/modules/tokens/components/TokenTableTransfers.vue'
+import TokenTableHolders from '@app/modules/tokens/components/TokenTableHolders.vue'
 import { Tx } from '@app/core/models'
 import { Component, Vue, Prop } from 'vue-property-decorator'
 
@@ -41,11 +41,11 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
   components: {
     AppTabs,
     AppError,
-    TransferTableTokens,
-    HolderTableTokens
+    TokenTableTransfers,
+    TokenTableHolders
   }
 })
-export default class TransferListTokens extends Vue {
+export default class TokenDetailsTabs extends Vue {
   @Prop(String) addressRef: string
   @Prop(Array) tokenTransfers: any
   @Prop(Array) tokenHolders: any

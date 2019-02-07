@@ -44,6 +44,12 @@
         :is-loading="isHolderDetailsListLoading"
         :error="errorTokenDetailsList"
       />
+      <holder-details-tabs 
+        :address-ref="addressRef"
+        :holder-transfers="holderTransfers"
+        :is-holder-transfers-loading="isHolderTransfersLoading"
+        :error-holder-transfers="errorHolderTransfers"
+      />
     </div>
 
   </v-container>
@@ -54,6 +60,7 @@ import AppBreadCrumbs from '@app/core/components/ui/AppBreadCrumbs.vue'
 import TokenDetailsList from '@app/modules/tokens/components/TokenDetailsList.vue'
 import TokenDetailsTabs from '@app/modules/tokens/components/TokenDetailsTabs.vue'
 import HolderDetailsList from '@app/modules/tokens/components/HolderDetailsList.vue'
+import HolderDetailsTabs from '@app/modules/tokens/components/HolderDetailsTabs.vue'
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { Events } from 'ethvm-common'
 import { Detail } from '@app/core/components/props'
@@ -66,7 +73,8 @@ const MAX_ITEMS = 10
     AppBreadCrumbs,
     TokenDetailsList,
     TokenDetailsTabs,
-    HolderDetailsList
+    HolderDetailsList,
+    HolderDetailsTabs
   }
 })
 export default class PageDetailsToken extends Vue {
@@ -89,10 +97,10 @@ export default class PageDetailsToken extends Vue {
   isHolder = false // Whether or not "holder" is included in query params to display view accordingly
   holderAddress: any = '' // Address of current token holder, if applicable
   holderDetails: any = {} // Balance/information for a particular holder address
-  holderTransactions: any[] = [] // Transactions for a particular holder address
-  isHolderTransactionsLoading = true // Can technically be empty array, so must be manually set
+  holderTransfers: any[] = [] // Transactions for a particular holder address
+  isHolderTransfersLoading = true // Can technically be empty array, so must be manually set
   errorHolderDetailsList = '' // Error string pertaining to the HolderDetailsList component
-  errorHolderTransactions = '' // Error string pertaining to the HolderDetailsTabs component
+  errorHolderTransfers = '' // Error string pertaining to the HolderDetailsTabs component
 
   /*
   ===================================================================================
@@ -131,9 +139,10 @@ export default class PageDetailsToken extends Vue {
       this.isHolder = false
       this.holderAddress = ''
       this.holderDetails = {}
-      this.holderTransactions = []
-      this.holderTransactionsLoading = false
+      this.holderTransfers = []
+      this.holderTransfersLoading = false
     }
+    window.scrollTo(0,0)
   }
 
   /*
@@ -232,8 +241,8 @@ export default class PageDetailsToken extends Vue {
       this.isHolder = true
       this.holderAddress = query.holder
       this.holderDetails = {}
-      this.holderTransactions = []
-      this.holderTransactionsLoading = true
+      this.holderTransfers = []
+      this.holderTransfersLoading = true
 
       const holderDetailsListPromise = this.loadHolderDetailsList()
       const holderDetailsTabsTransactionsPromise = this.loadHolderDetailsTabsTransactions()
@@ -265,14 +274,14 @@ export default class PageDetailsToken extends Vue {
    */
   loadHolderDetailsTabsTransactions() {
     return new Promise((resolve, reject) => {
-      const holderTransactionsPromise = this.fetchHolderTransactions()
+      const holderTransfersPromise = this.fetchHolderTransfers()
 
-      Promise.all([holderTransactionsPromise])
-        .then(([holderTransactions]) => {
-          this.holderTransactions = holderTransactions
+      Promise.all([holderTransfersPromise])
+        .then(([holderTransfers]) => {
+          this.holderTransfers = holderTransfers
         })
         .catch(e => {
-          this.errorHolderTransactions = `${e}`
+          this.errorHolderTransfers = `${e}`
         })
     })
   }
@@ -414,17 +423,20 @@ export default class PageDetailsToken extends Vue {
    *
    * @return {Array} - Array of transactions
    */
-  fetchHolderTransactions() {
+  fetchHolderTransfers() {
     return new Promise((resolve, reject) => {
+      this.isHolderTransfersLoading = true
       this.$http
         .get(`http://api.ethplorer.io/getAddressHistory/${this.holderAddress}?apiKey=freekey&token=${this.addressRef}&type=transfer`)
         .then(response => {
+          this.isHolderTransfersLoading = false
           if (response.data.error) {
             return reject(response.data.error.message)
           }
           resolve(response.data.operations)
         })
         .catch(err => {
+          this.isHolderTransfersLoading = false
           reject(err)
         })
     })

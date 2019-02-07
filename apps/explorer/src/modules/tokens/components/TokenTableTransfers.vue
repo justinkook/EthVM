@@ -82,7 +82,7 @@ import { Tx } from '@app/core/models'
 const MAX_ITEMS = 5
 
 @Component
-export default class TransferTableTokens extends Vue {
+export default class TokenTableTransfers extends Vue {
   @Prop(Array) transfers
 
   page = 1 // Current pagination page number
