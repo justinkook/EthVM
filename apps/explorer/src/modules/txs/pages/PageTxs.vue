@@ -3,7 +3,9 @@
     <app-bread-crumbs :new-items="crumbs" />
     <app-card-stats-group type="txs" />
     <v-layout row justify-center mb-4>
-      <v-flex xs12> <table-txs :transactions="txs" page-type="tx" :loading="txsLoad" /> </v-flex>
+      <v-flex xs12>
+        <table-txs :transactions="txs" page-type="tx" :loading="txsLoad" />
+      </v-flex>
     </v-layout>
   </v-container>
 </template>
@@ -38,7 +40,7 @@ export default class PageTxs extends Vue {
   }
 
   get txsLoad(): boolean {
-    return this.txs.length == 0
+    return this.txs.length === 0
   }
 }
 </script>

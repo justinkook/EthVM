@@ -33,7 +33,7 @@ export default class PageTokens extends Vue {
 
   /*
   ===================================================================================
-    Methods
+    Methods - Load Data
   ===================================================================================
   */
 
@@ -53,6 +53,12 @@ export default class PageTokens extends Vue {
         this.error = e
       })
   }
+
+  /*
+  ===================================================================================
+    Methods - Fetch Data - Individual Calls
+  ===================================================================================
+  */
 
   /**
    * GET and return JSON array of tokens and their corresponding information

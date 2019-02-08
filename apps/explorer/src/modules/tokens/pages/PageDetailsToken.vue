@@ -335,7 +335,7 @@ export default class PageDetailsToken extends Vue {
   //  *
   //  * @return {Array} - Array of token transfers
   //  */
-  // fetchTokensTransfers(page = 0, limit = MAX_ITEMS) {
+  // fetchTokenTransfers(page = 0, limit = MAX_ITEMS) {
   //   return new Promise((resolve, reject) => {
   //     this.$api
   //       .getAddressTokenTransfers(this.addressRef, limit, page)

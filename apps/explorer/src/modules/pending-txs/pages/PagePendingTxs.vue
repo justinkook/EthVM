@@ -33,6 +33,7 @@ export default class PagePendingTxs extends Vue {
 
   // Computed
   get txs(): Tx[] {
+    console.log(this.$store.getters.pendingTxs)
     return this.$store.getters.pendingTxs
   }
 
