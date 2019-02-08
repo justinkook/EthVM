@@ -1,17 +1,18 @@
 <template>
   <v-container grid-list-lg class="mb-0">
+    <app-bread-crumbs :new-items="crumbs" />
     <table-tokens :tokens="tokens" :is-loading="isLoading" />
   </v-container>
 </template>
 
 <script lang="ts">
-import AppPageBase from '@app/core/components/ui/AppPageBase.vue'
+import AppBreadCrumbs from '@app/core/components/ui/AppBreadCrumbs.vue'
 import TableTokens from '@app/modules/tokens/components/TableTokens.vue'
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
   components: {
-    AppPageBase,
+    AppBreadCrumbs,
     TableTokens
   }
 })

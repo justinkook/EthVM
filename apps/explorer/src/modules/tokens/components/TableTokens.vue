@@ -1,9 +1,21 @@
 <template>
   <v-layout row wrap justify-center mb-4>
-    {{ isLoading }}
     <v-flex xs12>
-      <v-data-table :headers="headers" :items="filteredTokens" :must-sort="true" :pagination.sync="sortBy" :custom-sort="customSort" class="elevation-1">
+      <v-data-table
+        :headers="headers"
+        :items="filteredTokens"
+        :must-sort="true"
+        :pagination.sync="sortBy"
+        :custom-sort="customSort"
+        class="elevation-1"
+        :loading="isLoading"
+      >
         <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
+        <!--
+        =====================================================================================
+          DATA
+        =====================================================================================
+        -->
         <template slot="items" slot-scope="props" v-if="hasCompleteData(props.item)">
           <td>
             <v-layout align-center justify-start row fill-height>
@@ -11,10 +23,24 @@
               <router-link :to="tokenLink(props.item.address)">{{ props.item.name }}</router-link>
             </v-layout>
           </td>
-          <td class="">{{ props.item.current_price }}</td>
-          <td class="">{{ props.item.price_change_percentage_24h }}</td>
-          <td class="">{{ props.item.total_volume }}</td>
-          <td class="text-xs-right">{{ props.item.market_cap }}</td>
+          <td class="">${{ props.item.current_price }}</td>
+          <td class="">
+            <span :style="changeStyle(props.item.price_change_percentage_24h)">{{ props.item.price_change_percentage_24h }}</span>
+          </td>
+          <td class="">${{ props.item.total_volume }}</td>
+          <td class="text-xs-right">${{ props.item.market_cap }}</td>
+        </template>
+        <!--
+        =====================================================================================
+          NO DATA
+
+          Show placeholder rows until data is loaded.
+        =====================================================================================
+        -->
+        <template slot="no-data">
+          <tr v-for="i in 10" :key="i">
+            <td v-for="j in 5" :key="j"><v-flex xs12 style="background: #e6e6e6; height: 12px; border-radius: 2px;"></v-flex></td>
+          </tr>
         </template>
       </v-data-table>
     </v-flex>
@@ -76,8 +102,24 @@ export default class TableTokens extends Vue {
     return items
   }
 
+  /**
+   * Properly format URL to token details page
+   *
+   * @param  {String} tokenAddress - Token object address
+   * @return {String} - Formatted address
+   */
   tokenLink(tokenAddress) {
     return `/token/0x${tokenAddress}`
+  }
+
+  /**
+   * Crudely apply color to change percentage element
+   *
+   * @param  {Integer} changePercentage - Token object change%
+   * @return {String} - Style to apply
+   */
+  changeStyle(changePercentage) {
+    return changePercentage >= 0 ? 'color: #17b134;' : 'color: #f21511;'
   }
 
   /*
