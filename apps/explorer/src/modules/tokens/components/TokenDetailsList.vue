@@ -1,17 +1,7 @@
 <template>
   <div>
-    <app-error 
-      :has-error="hasError" 
-      :message="error" 
-      class="mb-4"
-    />
-    <app-details-list
-      v-if="!hasError"
-      :title="title"
-      :details="details"
-      :is-loading="isLoading"
-      class="mb-4"
-    />
+    <app-error :has-error="hasError" :message="error" class="mb-4" />
+    <app-details-list v-if="!hasError" :title="title" :details="details" :is-loading="isLoading" class="mb-4" />
   </div>
 </template>
 
@@ -56,7 +46,6 @@ export default class TokenDetailsList extends Vue {
    * @return {String} - Title for details list
    */
   get title() {
-    // <img src="${this.contractDetails.metadata.logo.src}" /> 
     return `${this.tokenDetails.name} (${this.tokenDetails.symbol})`
   }
 
@@ -119,7 +108,7 @@ export default class TokenDetailsList extends Vue {
         {
           title: this.$i18n.t('title.contract').toString(),
           detail: this.tokenDetails.address,
-          link: this.token ? `/address/${this.tokenDetails.address}` : ''
+          link: this.tokenDetails ? `/address/${this.tokenDetails.address}` : ''
         },
         {
           title: this.$i18n.t('token.owner').toString(),

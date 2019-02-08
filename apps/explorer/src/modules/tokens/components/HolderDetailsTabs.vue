@@ -3,10 +3,7 @@
     <!-- Transfers -->
     <v-tab-item slot="tabs-item" value="tab-0">
       <v-progress-linear color="blue" indeterminate v-if="isHolderTransfersLoading" class="mt-0" />
-      <holder-table-transfers
-        v-if="!isHolderTransfersLoading && !hasErrorHolderTransfers"
-        :transfers="holderTransfers" 
-      />
+      <holder-table-transfers v-if="!isHolderTransfersLoading && !hasErrorHolderTransfers" :transfers="holderTransfers" />
     </v-tab-item>
     <!-- End Transfers -->
   </app-tabs>

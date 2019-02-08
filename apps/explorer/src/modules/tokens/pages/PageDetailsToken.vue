@@ -17,7 +17,7 @@
         :is-loading="isTokenDetailsListLoading"
         :error="errorTokenDetailsList"
       />
-      <token-details-tabs 
+      <token-details-tabs
         :address-ref="addressRef"
         :token-transfers="tokenTransfers"
         :token-holders="tokenHolders"
@@ -44,14 +44,13 @@
         :is-loading="isHolderDetailsListLoading"
         :error="errorTokenDetailsList"
       />
-      <holder-details-tabs 
+      <holder-details-tabs
         :address-ref="addressRef"
         :holder-transfers="holderTransfers"
         :is-holder-transfers-loading="isHolderTransfersLoading"
         :error-holder-transfers="errorHolderTransfers"
       />
     </div>
-
   </v-container>
 </template>
 
@@ -140,7 +139,7 @@ export default class PageDetailsToken extends Vue {
       this.holderAddress = ''
       this.holderDetails = {}
       this.holderTransfers = []
-      this.holderTransfersLoading = false
+      this.isHolderTransfersLoading = false
     }
     window.scrollTo(0, 0)
   }
@@ -176,8 +175,8 @@ export default class PageDetailsToken extends Vue {
 
       Promise.all(promises)
         .then(([contractDetails, tokenDetails]) => {
-          this.contractDetails = contractDetails
-          this.tokenDetails = tokenDetails
+          this.contractDetails = contractDetails as any
+          this.tokenDetails = tokenDetails as any
           resolve()
         })
         .catch(e => {
@@ -197,7 +196,7 @@ export default class PageDetailsToken extends Vue {
 
       Promise.all(promises)
         .then(([tokenTransfers]) => {
-          this.tokenTransfers = tokenTransfers
+          this.tokenTransfers = tokenTransfers as any[]
           resolve()
         })
         .catch(e => {
@@ -216,7 +215,7 @@ export default class PageDetailsToken extends Vue {
 
       Promise.all([tokenHoldersPromise])
         .then(([tokenHolders]) => {
-          this.tokenHolders = tokenHolders
+          this.tokenHolders = tokenHolders as any[]
           resolve()
         })
         .catch(e => {
@@ -242,7 +241,7 @@ export default class PageDetailsToken extends Vue {
       this.holderAddress = query.holder
       this.holderDetails = {}
       this.holderTransfers = []
-      this.holderTransfersLoading = true
+      this.isHolderTransfersLoading = true
 
       const holderDetailsListPromise = this.loadHolderDetailsList()
       const holderDetailsTabsTransactionsPromise = this.loadHolderDetailsTabsTransactions()
@@ -261,7 +260,7 @@ export default class PageDetailsToken extends Vue {
 
       Promise.all([holderDetailsPromise])
         .then(([holderDetails]) => {
-          this.holderDetails = holderDetails
+          this.holderDetails = holderDetails as any
         })
         .catch(e => {
           this.errorHolderDetailsList = `${e}`
@@ -278,7 +277,7 @@ export default class PageDetailsToken extends Vue {
 
       Promise.all([holderTransfersPromise])
         .then(([holderTransfers]) => {
-          this.holderTransfers = holderTransfers
+          this.holderTransfers = holderTransfers as any[]
         })
         .catch(e => {
           this.errorHolderTransfers = `${e}`

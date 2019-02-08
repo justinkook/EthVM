@@ -8,10 +8,7 @@
     <v-tab-item slot="tabs-item" value="tab-0">
       <v-progress-linear color="blue" indeterminate v-if="isTokenTransfersLoading" class="mt-0" />
       <app-error :has-error="hasErrorTokenTransfers" :message="errorTokenTransfers" />
-      <token-table-transfers 
-        v-if="!isTokenTransfersLoading && !hasErrorTokenTransfers" 
-        :transfers="tokenTransfers" 
-       />
+      <token-table-transfers v-if="!isTokenTransfersLoading && !hasErrorTokenTransfers" :transfers="tokenTransfers" />
     </v-tab-item>
     <!--
     =====================================================================================
@@ -20,11 +17,7 @@
     -->
     <v-tab-item slot="tabs-item" value="tab-1">
       <v-progress-linear color="blue" indeterminate v-if="isTokenHoldersLoading" class="mt-0" />
-      <token-table-holders 
-        v-if="!isTokenHoldersLoading" 
-        :holders="tokenHolders"
-        :address-ref="addressRef"
-       />
+      <token-table-holders v-if="!isTokenHoldersLoading" :holders="tokenHolders" :address-ref="addressRef" />
     </v-tab-item>
   </app-tabs>
 </template>

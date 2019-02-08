@@ -1,17 +1,7 @@
 <template>
   <div>
-    <app-error 
-      :has-error="hasError" 
-      :message="error" 
-      class="mb-4"
-    />
-    <app-details-list
-      v-if="!hasError"
-      :title="title"
-      :details="details"
-      :is-loading="isLoading"
-      class="mb-4"
-    />
+    <app-error :has-error="hasError" :message="error" class="mb-4" />
+    <app-details-list v-if="!hasError" :title="title" :details="details" :is-loading="isLoading" class="mb-4" />
   </div>
 </template>
 

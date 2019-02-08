@@ -105,7 +105,8 @@
     "notMined": "This block has not been mined yet",
     "noTx": "This Transaction does not exist",
     "notValid": "Invalid ",
-    "invalidHash": "Invalid hash"
+    "invalidHash": "Invalid hash",
+    "sync": "We are synchronizing with the Blockchain. Some features might not work correctly."
   },
   "block": {
     "height": "Height",

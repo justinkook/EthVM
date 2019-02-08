@@ -1,7 +1,7 @@
 <template>
-  <app-page-base :has-error="hasError" :error-message="error" :crumbs="crumbs" :is-loading="isLoading">
-    <table-tokens :tokens="tokens" />
-  </app-page-base>
+  <v-container grid-list-lg class="mb-0">
+    <table-tokens :tokens="tokens" :is-loading="isLoading" />
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -40,7 +40,7 @@ export default class PageTokens extends Vue {
    * Fetch all data relevant to the view.
    */
   fetchData() {
-    const tokenPromise = this.fetchTokens()
+    const tokenPromise = this.fetchTokenExchangeRates()
     const promises = [tokenPromise]
 
     Promise.all(promises)
@@ -51,27 +51,6 @@ export default class PageTokens extends Vue {
         this.hasError = true
         this.error = e
       })
-  }
-
-  /**
-   * GET and return a JSON array of ETH-based tokens
-   *
-   * @return {Array} - Array of ETH Tokens.
-   */
-  fetchTokens() {
-    return new Promise((resolve, reject) => {
-      this.$http
-        .get('http://api.ethplorer.io/getTop?apiKey=freekey&criteria=cap')
-        .then(response => {
-          if (response.data.error) {
-            return reject(response.data.error.message)
-          }
-          resolve(response.data.tokens)
-        })
-        .catch(err => {
-          reject(err.data.error.message)
-        })
-    })
   }
 
   /**
