@@ -316,17 +316,28 @@ export default class PageDetailsToken extends Vue {
    */
   fetchTokenDetails() {
     return new Promise((resolve, reject) => {
-      this.$http
-        .get(`http://api.ethplorer.io/getTokenInfo/${this.addressRef}?apiKey=freekey&additional=image`)
+      this.$api
+        .getTokenExchangeRateByAddress(this.addressRef)
         .then(response => {
-          if (response.data.error) {
-            return reject(response.data.error.message)
+          if (response === null) {
+            reject('Invalid Address')
           }
-          resolve(response.data)
+          resolve(response)
         })
-        .catch(err => {
-          reject(err)
+        .catch(e => {
+          reject(e)
         })
+      // this.$http
+      //   .get(`http://api.ethplorer.io/getTokenInfo/${this.addressRef}?apiKey=freekey&additional=image`)
+      //   .then(response => {
+      //     if (response.data.error) {
+      //       return reject(response.data.error.message)
+      //     }
+      //     resolve(response.data)
+      //   })
+      //   .catch(err => {
+      //     reject(err)
+      //   })
     })
   }
 
@@ -470,7 +481,7 @@ export default class PageDetailsToken extends Vue {
         disabled: false
       },
       {
-        text: this.isTokenDetailsLoading ? this.addressRef : this.tokenDetails.symbol,
+        text: this.isTokenDetailsLoading ? this.addressRef : this.tokenDetails.symbol.toUpperCase(),
         link: `/token/${this.addressRef}`,
         disabled: true
       }
@@ -490,7 +501,7 @@ export default class PageDetailsToken extends Vue {
         disabled: false
       },
       {
-        text: this.isTokenDetailsLoading ? this.addressRef : this.tokenDetails.symbol,
+        text: this.isTokenDetailsLoading ? this.addressRef : this.tokenDetails.symbol.toUpperCase(),
         link: `/token/${this.addressRef}`,
         disabled: false
       },

@@ -11,13 +11,19 @@
       </v-flex>
     </v-layout>
     <v-divider class="lineGrey" />
+    <!--
+    =====================================================================================
+      LOADING / ERROR
+    =====================================================================================
+    -->
     <v-progress-linear color="blue" indeterminate v-if="loading" class="mt-0" />
+    <app-error :has-error="hasError" :message="error" class="mb-4" />
     <!--
     =====================================================================================
       PAGINATION
     =====================================================================================
     -->
-    <v-layout v-if="!loading" row fill-height align-center justify-space-between>
+    <v-layout v-if="!loading && !hasError" row fill-height align-center justify-space-between>
       <div v-html="paginationText" class="ml-2"></div>
       <v-pagination v-model="page" :length="numPages" class="mt-2 mb-2"> </v-pagination>
     </v-layout>
@@ -26,7 +32,7 @@
       TABLE HEADER
     =====================================================================================
     -->
-    <v-card color="info" flat class="white--text pl-3 pr-1 mt-2 mb-2" height="40px">
+    <v-card v-if="!hasError" color="info" flat class="white--text pl-3 pr-1 mt-2 mb-2" height="40px">
       <v-layout align-center justify-start row fill-height pr-3>
         <v-flex xs6 sm8 md5>
           <h5>{{ $t('tableHeader.txN') }}</h5>
@@ -51,7 +57,7 @@
       TABLE BODY
     =====================================================================================
     -->
-    <v-card flat>
+    <v-card flat v-if="!hasError">
       <v-layout column fill-height class="mb-1">
         <v-flex xs12 v-if="!loading">
           <v-card v-for="tx in transactionsPage" class="transparent" flat :key="tx.getHash()">
@@ -60,9 +66,9 @@
           </v-card>
         </v-flex>
         <v-flex xs12 v-if="loading">
-          <div v-for="i in maxItems">
+          <div v-for="i in maxItems" :key="i">
             <v-layout grid-list-xs row wrap align-center justify-start fill-height class="pl-2 pr-2 pt-2">
-               <v-flex xs6 sm8 md5>
+              <v-flex xs6 sm8 md5>
                 <v-flex xs12 style="background: #e6e6e6; height: 12px; border-radius: 2px;"></v-flex>
               </v-flex>
               <v-flex hidden-xs-only sm3 md2>
@@ -87,7 +93,7 @@
 </template>
 
 <script lang="ts">
-import AppInfoLoad from '@app/core/components/ui/AppInfoLoad.vue'
+import AppError from '@app/core/components/ui/AppError.vue'
 import TableTxsRow from '@app/modules/txs/components/TableTxsRow.vue'
 import { PendingTx, Tx } from '@app/core/models'
 import { Vue, Component, Prop } from 'vue-property-decorator'
@@ -96,7 +102,7 @@ const MAX_ITEMS = 10
 
 @Component({
   components: {
-    AppInfoLoad,
+    AppError,
     TableTxsRow
   }
 })
@@ -105,6 +111,7 @@ export default class TableTxs extends Vue {
   @Prop(String) pageType: string
   @Prop(String) showStyle!: string
   @Prop(Array) transactions!: Tx[] | PendingTx[]
+  @Prop(String) error: string
 
   page = 1 // Current pagination page number
 
@@ -113,6 +120,16 @@ export default class TableTxs extends Vue {
     Computed Values
   ===================================================================================
   */
+
+  /**
+   * Determines whether or not component has an error.
+   * If error property is empty string, there is no error.
+   *
+   * @return {Boolean} - Whether or not error exists
+   */
+  get hasError(): boolean {
+    return this.error !== ''
+  }
 
   /**
    * Return const MAX_ITEMS

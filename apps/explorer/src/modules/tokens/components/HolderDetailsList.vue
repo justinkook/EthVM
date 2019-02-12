@@ -47,7 +47,12 @@ export default class HolderDetailsList extends Vue {
    * @return {String} - Title for details list
    */
   get title() {
-    return `${this.tokenDetails.name} (${this.tokenDetails.symbol}) - Filtered by Holder`
+    if (this.isLoading) {
+      return ''
+    }
+    return `<img src="${this.tokenDetails.image}" class="mr-2" style="width: 25px" />  ${
+      this.tokenDetails.name
+    } (${this.tokenDetails.symbol.toUpperCase()}) - Filtered by Holder`
   }
 
   /**
@@ -120,7 +125,7 @@ export default class HolderDetailsList extends Vue {
         },
         {
           title: this.$i18n.t('title.marketCap').toString(),
-          detail: `$${this.tokenDetails.price.marketCapUsd}`
+          detail: `$${this.tokenDetails.current_price}`
         },
         {
           title: this.$i18n.t('title.decimals').toString(),
@@ -132,7 +137,7 @@ export default class HolderDetailsList extends Vue {
   }
 
   get balanceUsd() {
-    return this.holderDetails.tokens ? this.tokenDetails.price.rate * this.holderDetails.tokens[0].balance : 'N/A'
+    return this.holderDetails.tokens ? this.tokenDetails.current_price * this.holderDetails.tokens[0].balance : 'N/A'
   }
 }
 </script>

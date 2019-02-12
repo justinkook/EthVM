@@ -46,7 +46,10 @@ export default class TokenDetailsList extends Vue {
    * @return {String} - Title for details list
    */
   get title() {
-    return `${this.tokenDetails.name} (${this.tokenDetails.symbol})`
+    if (this.isLoading || this.hasError) {
+      return ''
+    }
+    return `<img src="${this.tokenDetails.image}" class="mr-2" style="width: 25px" /> ${this.tokenDetails.name} (${this.tokenDetails.symbol.toUpperCase()})`
   }
 
   /**
@@ -112,24 +115,24 @@ export default class TokenDetailsList extends Vue {
         },
         {
           title: this.$i18n.t('token.owner').toString(),
-          detail: this.tokenDetails.owner,
+          detail: this.tokenDetails.owner ? this.tokenDetails.owner : 'REQUIRED DATA',
           link: `/address/${this.tokenDetails.owner}`
         },
         {
           title: this.$i18n.t('title.supply').toString(),
-          detail: this.tokenDetails.totalSupply
+          detail: this.tokenDetails.total_supply
         },
         {
           title: this.$i18n.t('title.price').toString(),
-          detail: `$${this.tokenDetails.price.rate} (${this.tokenDetails.price.diff}%)`
+          detail: `$${this.tokenDetails.current_price} (${this.tokenDetails.price_change_percentage_24h}%)`
         },
         {
           title: this.$i18n.t('title.marketCap').toString(),
-          detail: `$${this.tokenDetails.price.marketCapUsd}`
+          detail: `$${this.tokenDetails.market_cap}`
         },
         {
           title: this.$i18n.t('token.totalHold').toString(),
-          detail: `${this.tokenDetails.holdersCount}`
+          detail: this.tokenDetails.holdersCount ? `${this.tokenDetails.holdersCount}` : 'REQUIRED DATA'
         },
         {
           title: this.$i18n.t('title.decimals').toString(),
