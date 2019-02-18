@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.5.0;
 
 /**
  * @title BytesToTypes
@@ -19,48 +19,45 @@ contract BytesToTypes {
         assembly {
             x := mload(add(_input, _offst))
         }
-        x==0 ? _output = false : _output = true;
+        x == 0 ? _output = false : _output = true;
     }
 
     function getStringSize(uint _offst, bytes memory _input) internal pure returns(uint size){
         assembly{
-            size := mload(add(_input,_offst))
-            let chunk_count := add(div(size,32),1) // chunk_count = size/32 + 1
+            size := mload(add(_input, _offst))
+            let chunk_count := add(div(size, 32), 1) // chunk_count = size/32 + 1
 
-            if gt(mod(size,32),0) {// if size%32 > 0
-                chunk_count := add(chunk_count,1)
+            if gt(mod(size, 32), 0) {// if size%32 > 0
+                chunk_count := add(chunk_count, 1)
             }
 
-            size := mul(chunk_count,32)// first 32 bytes reseves for size in strings
+            size := mul(chunk_count, 32)// first 32 bytes reseves for size in strings
         }
     }
 
-    function bytesToString(uint _offst, bytes memory _input, bytes memory _output) internal  {
+    function bytesToString(uint _offst, bytes memory _input, bytes memory _output) internal pure {
         uint size = 32;
         assembly {
-            let loop_index := 0
             let chunk_count
 
-            size := mload(add(_input,_offst))
-            chunk_count := add(div(size,32),1) // chunk_count = size/32 + 1
+            size := mload(add(_input, _offst))
+            chunk_count := add(div(size, 32), 1) // chunk_count = size/32 + 1
 
-            if gt(mod(size,32),0) {
-                chunk_count := add(chunk_count,1)  // chunk_count++
+            if gt(mod(size, 32), 0) {
+                chunk_count := add(chunk_count, 1)  // chunk_count++
             }
 
-            loop:
-                mstore(add(_output,mul(loop_index,32)),mload(add(_input,_offst)))
-                _offst := sub(_offst,32)           // _offst -= 32
-                loop_index := add(loop_index,1)
-
-            jumpi(loop , lt(loop_index , chunk_count))
+            for { let index:= 0 }  lt(index, chunk_count){ index := add(index, 1) } {
+                mstore(add(_output, mul(index, 32)), mload(add(_input, _offst)))
+                _offst := sub(_offst, 32)           // _offst -= 32
+            }
         }
     }
 
     function bytesToBytes32(uint _offst, bytes memory  _input, bytes32 _output) internal pure {
         assembly {
-            mstore(_output , add(_input, _offst))
-            mstore(add(_output,32) , add(add(_input, _offst),32))
+            mstore(_output, add(_input, _offst))
+            mstore(add(_output, 32), add(add(_input, _offst), 32))
         }
     }
 

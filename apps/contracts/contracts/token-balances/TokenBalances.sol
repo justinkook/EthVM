@@ -1,7 +1,8 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.5.0;
 
 import "./Seriality/Seriality.sol";
 import "./PublicTokens.sol";
+
 
 contract TokenBalances is Seriality {
 
@@ -15,26 +16,14 @@ contract TokenBalances is Seriality {
         bool isValid;    // whether the token is valid or not
     }
 
-    PublicTokens pubT;
+    PublicTokens private pubT;
 
     constructor(address tokenStorage) public {
         pubT = PublicTokens(tokenStorage);
     }
 
     function getTokenStorage() public view returns (address) {
-        return pubT;
-    }
-
-    function isContract(address addr) internal view returns (bool) {
-        uint32 size;
-        assembly {
-            size := extcodesize(addr)
-        }
-        return size > 0;
-    }
-
-    function getToken(uint id) internal view returns (Token token) {
-        (token.name, token.symbol, token.addr, token.decimals, token.website, token.email, token.isValid) = pubT.pubTokens(id);
+        return address(pubT);
     }
 
     function getTokenBalance(address tokenAddr, address addr) public view returns (uint bal) {
@@ -42,10 +31,12 @@ contract TokenBalances is Seriality {
         assembly {
             // move pointer to free memory spot
             let ptr := mload(0x40)
+
             // put function sig at memory spot
             mstore(ptr, sig)
+
             // append argument after function sig
-            mstore(add(ptr,0x04), addr)
+            mstore(add(ptr, 0x04), addr)
 
             let result := call(
                 150000,    // gas limit
@@ -54,7 +45,8 @@ contract TokenBalances is Seriality {
                 ptr,       // Inputs are stored at location ptr
                 0x24,      // Inputs are 36 bytes long
                 ptr,       // Store output over input
-                0x20)      // Outputs are 32 bytes long
+                0x20      // Outputs are 32 bytes long
+            )
 
             if iszero(result) {
                 bal := 0 // return 0 on error and 0 balance
@@ -64,11 +56,17 @@ contract TokenBalances is Seriality {
                 bal := mload(ptr) // Assign output to answer var
             }
 
-            mstore(0x40, add(ptr,0x20)) // Set storage pointer to new space
+            mstore(0x40, add(ptr, 0x20)) // Set storage pointer to new space
         }
     }
 
-    function getAllBalance(address _owner, bool name, bool website, bool email, uint _count) public view returns (bytes) {
+    function getAllBalance(
+        address _owner,
+        bool name,
+        bool website,
+        bool email,
+        uint _count
+    ) public view returns (bytes memory) {
         uint count;
         address tOwner = _owner;
 
@@ -92,7 +90,7 @@ contract TokenBalances is Seriality {
                 if (website) bufferSize += 32;
                 if (email) bufferSize += 32;
                 bufferSize += 69; // address (20) + symbol(16) + balance(32) + decimals(1)
-    		} else {
+            } else {
                 validTokens[i] = false;
             }
         }
@@ -103,54 +101,64 @@ contract TokenBalances is Seriality {
         // serialize
         boolToBytes(offset, true, result);
         offset -= 1;
-
         uintToBytes(offset, countValidTokens, result);
         offset -= 32;
-
         boolToBytes(offset, name, result);
         offset -= 1;
-
         boolToBytes(offset, website, result);
         offset -= 1;
-
         boolToBytes(offset, email, result);
         offset -= 1;
 
-        for (i = 1; i <= count; i++) {
+        for (uint i = 1; i <= count; i++) {
             if (!validTokens[i]) {
                 continue;
             }
 
-            token = getToken(i);
+            Token memory token = getToken(i);
 
             bytes16ToBytesR(offset, token.symbol, result);
             offset -= 16;
-
             addressToBytes(offset, token.addr, result);
             offset -= 20;
-
             uintToBytes(offset, token.decimals, result);
             offset -= 1;
-
             uintToBytes(offset, getTokenBalance(token.addr, tOwner), result);
             offset -= 32;
-
             if (name) {
                 bytes16ToBytesR(offset, token.name, result);
                 offset -= 16;
-    		}
-
+            }
             if (website) {
                 bytes32ToBytesR(offset, token.website, result);
                 offset -= 32;
-    		}
-
+            }
             if (email) {
                 bytes32ToBytesR(offset, token.email, result);
                 offset -= 32;
-    		}
+            }
         }
 
         return result;
+    }
+
+    function getToken(uint id) internal view returns (Token memory token) {
+        (
+            token.name,
+            token.symbol,
+            token.addr,
+            token.decimals,
+            token.website,
+            token.email,
+            token.isValid
+        ) = pubT.pubTokens(id);
+    }
+
+    function isContract(address addr) internal view returns (bool) {
+        uint32 size;
+        assembly {
+            size := extcodesize(addr)
+        }
+        return size > 0;
     }
 }

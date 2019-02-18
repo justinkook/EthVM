@@ -1,4 +1,5 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.5.0;
+
 
 contract PublicTokens {
     uint public tokenCount = 0;      //total count of all added tokens
@@ -19,17 +20,17 @@ contract PublicTokens {
     mapping(address => bool) public moderator;
     mapping(address => uint) public idMap;
 
-    modifier owner_only() {
+    modifier ownerOnly() {
         require(owner == msg.sender, "only owner");
         _;
     }
 
-    modifier only_mod() {
+    modifier onlyMod() {
         require(owner == msg.sender || moderator[msg.sender] == true, "only moderator");
         _;
     }
 
-    modifier only_contract(address addr) {
+    modifier onlyContract(address addr) {
         uint32 size;
         assembly {
             size := extcodesize(addr)
@@ -39,19 +40,19 @@ contract PublicTokens {
     }
 
     modifier no_null(address addr) {
-        require(addr != 0x0, "invalid address");
+        require(addr != address(0), "invalid address");
         _;
     }
 
-    constructor () public {
+    constructor() public {
         owner = msg.sender;
     }
 
-    function addModerator(address addr) public owner_only {
+    function addModerator(address addr) public ownerOnly {
         moderator[addr] = true;
     }
 
-    function removeModerator(address addr) public owner_only {
+    function removeModerator(address addr) public ownerOnly {
         moderator[addr] = false;
     }
 
@@ -61,15 +62,16 @@ contract PublicTokens {
         address addr,
         uint8 decimals,
         bytes32 website,
-        bytes32 email) public only_mod no_null(addr) only_contract(addr) {
+        bytes32 email
+    ) public onlyMod no_null(addr) onlyContract(addr) {
         Token storage token = pubTokens[idMap[addr]];
-        if (token.addr == 0x0) {
+        if (token.addr == address(0)) {
             tokenCount++;
             tokenValidCount++;
             token = pubTokens[tokenCount];
             idMap[addr] = tokenCount;
             token.isValid = true;
-    	}
+        }
         token.name = name;
         token.symbol = symbol;
         token.addr = addr;
@@ -78,53 +80,57 @@ contract PublicTokens {
         token.email = email;
     }
 
-    function disableToken(address addr) public only_mod no_null(addr) {
+    function disableToken(address addr) public onlyMod no_null(addr) {
         Token storage token = pubTokens[idMap[addr]];
         if (token.addr == addr) {
             token.isValid = false;
             tokenValidCount--;
-    	}
+        }
     }
 
-    function enableToken(address addr) public only_mod no_null(addr) {
+    function enableToken(address addr) public onlyMod no_null(addr) {
         Token storage token = pubTokens[idMap[addr]];
         if (token.addr == addr) {
             token.isValid = false;
             tokenValidCount++;
-    	}
+        }
     }
 
     function getToken(address addr) public view returns (
-    	bytes16,
-    	bytes16,
-    	address,
-    	uint8,
-    	bytes32,
-    	bytes32) {
+        bytes16,
+        bytes16,
+        address,
+        uint8,
+        bytes32,
+        bytes32
+    ) {
         Token memory token = pubTokens[idMap[addr]];
         return (
-        	token.name,
-        	token.symbol,
-        	token.addr,
-        	token.decimals,
-        	token.website,
-            token.email);
+            token.name,
+            token.symbol,
+            token.addr,
+            token.decimals,
+            token.website,
+            token.email
+        );
     }
 
     function getTokenById(uint id) public view returns (
-    	bytes16,
-    	bytes16,
-    	address,
-    	uint8,
-    	bytes32,
-    	bytes32) {
+        bytes16,
+        bytes16,
+        address,
+        uint8,
+        bytes32,
+        bytes32
+    ) {
         Token memory token = pubTokens[id];
         return (
-        	token.name,
-        	token.symbol,
-        	token.addr,
-        	token.decimals,
-        	token.website,
-            token.email);
+            token.name,
+            token.symbol,
+            token.addr,
+            token.decimals,
+            token.website,
+            token.email
+        );
     }
 }

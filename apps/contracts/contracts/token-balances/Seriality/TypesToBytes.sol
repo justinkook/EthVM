@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 /**
  * @title TypesToBytes
@@ -8,7 +8,8 @@ pragma solidity ^0.4.24;
 
 contract TypesToBytes {
 
-    function TypesToBytes() internal {
+    constructor() internal {
+
     }
 
     function addressToBytes(uint _offst, address _input, bytes memory _output) internal pure {
@@ -17,32 +18,10 @@ contract TypesToBytes {
         }
     }
 
-    function bytes16ToBytesR(uint _offst, bytes16 _input, bytes memory _output) internal {
-        assembly {
-            let index := 0
-            let size := 16
-            loop:
-                mstore8(add(add(_output, _offst),add(16, index)), byte(index, _input))
-                index := add(index ,1)
-                jumpi(loop , lt(index,size))
-        }
-    }
-
-    function bytes32ToBytesR(uint _offst, bytes32 _input, bytes memory _output) internal {
-        assembly {
-            let index := 0
-            let size := 32
-            loop:
-                mstore8(add(add(_output, _offst),index), byte(index, _input))
-                index := add(index ,1)
-                jumpi(loop , lt(index,size))
-        }
-    }
-
-    function bytes32ToBytes(uint _offst, bytes32 _input, bytes memory _output) internal  {
+    function bytes32ToBytes(uint _offst, bytes32 _input, bytes memory _output) internal pure {
         assembly {
             mstore(add(_output, _offst), _input)
-            mstore(add(add(_output, _offst),32), add(_input,32))
+            mstore(add(add(_output, _offst), 32), add(_input, 32))
         }
     }
 
@@ -53,19 +32,16 @@ contract TypesToBytes {
         }
     }
 
-    function stringToBytes(uint _offst, bytes memory _input, bytes memory _output) internal {
+    function stringToBytes(uint _offst, bytes memory _input, bytes memory _output) internal pure {
         uint256 stack_size = _input.length / 32;
-        if(_input.length % 32 > 0) stack_size++;
+        if (_input.length % 32 > 0) stack_size++;
 
         assembly {
-            let index := 0
-            stack_size := add(stack_size,1)//adding because of 32 first bytes memory as the length
-        loop:
-
-            mstore(add(_output, _offst), mload(add(_input,mul(index,32))))
-            _offst := sub(_offst , 32)
-            index := add(index ,1)
-            jumpi(loop , lt(index,stack_size))
+            stack_size := add(stack_size, 1)//adding because of 32 first bytes memory as the length
+            for { let index := 0 } lt(index, stack_size){ index := add(index, 1) } {
+                mstore(add(_output, _offst), mload(add(_input, mul(index, 32))))
+                _offst := sub(_offst, 32)
+            }
         }
     }
 
@@ -80,5 +56,22 @@ contract TypesToBytes {
             mstore(add(_output, _offst), _input)
         }
     }
+
+    function bytes16ToBytesR(uint _offst, bytes16 _input, bytes memory _output) internal pure {
+        assembly {
+            for { let index := 0 } lt(index, 16){ index := add(index, 1) } {
+                mstore8(add(add(_output, _offst), add(16, index)), byte(index, _input))
+            }
+        }
+    }
+
+    function bytes32ToBytesR(uint _offst, bytes32 _input, bytes memory _output) internal pure {
+        assembly {
+            for { let index := 0 } lt(index, 32){ index := add(index, 1) } {
+                mstore8(add(add(_output, _offst), index), byte(index, _input))
+            }
+        }
+    }
+
 
 }
