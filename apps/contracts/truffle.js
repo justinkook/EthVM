@@ -1,12 +1,22 @@
 module.exports = {
   networks: {
-    dev: {
-      host: 'localhost',
+    development: {
+      host: "127.0.0.1",
+      port: 7545,
+      network_id: "*",
+      gasPrice: "0x12a05f200"
+    },
+    live: {
+      host: "127.0.0.1",
       port: 8545,
-      network_id: '1234',
-      gas: 4500000,
-      gasPrice: 10000000000,
-      from: '0x84baabad835e6ca9252658cd6eae0152f6330c09'
+      network_id: "*",
+      gasPrice: "0x3b9aca00"
+    },
+    ropsten: {
+      host: "https://api.myetherapi.com/rop",
+      port: 443,
+      network_id: "*",
+      gasPrice: "0x3b9aca00"
     }
   }
-}
+};
