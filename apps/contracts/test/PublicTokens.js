@@ -1,10 +1,11 @@
 const PublicTokens = artifacts.require("PublicTokens")
 const TokenBalances = artifacts.require("TokenBalances")
+
 const DummyToken = artifacts.require("DummyToken")
 const DummyContract = artifacts.require("DummyContract")
-const Web3 = require("web3")
-const web3 = new Web3()
-const bd = require("../libs/binaryDecoder.js")
+
+var utils = require('web3-utils')
+const bd = require("./bd.js")
 
 function trim(str) {
   return str.replace(/\0[\s\S]*$/g, "")
@@ -69,19 +70,19 @@ contract("PublicTokens", function(accounts) {
     let tokenInfo1 = await pt.getToken(dt1.address)
     let tokenInfo2 = await pt.getToken(dt2.address)
 
-    assert.equal(trim(web3.toAscii(tokenInfo1[0])), "Dummy Token 1")
-    assert.equal(trim(web3.toAscii(tokenInfo1[1])), "DT1")
+    assert.equal(trim(utils.toAscii(tokenInfo1[0])), "Dummy Token 1")
+    assert.equal(trim(utils.toAscii(tokenInfo1[1])), "DT1")
     assert.equal(tokenInfo1[2], dt1.address)
     assert.equal(tokenInfo1[3].toNumber(), 5)
-    assert.equal(trim(web3.toAscii(tokenInfo1[4])), "http://www.dtoken1.eth")
-    assert.equal(trim(web3.toAscii(tokenInfo1[5])), "support@dtoken1.eth")
+    assert.equal(trim(utils.toAscii(tokenInfo1[4])), "http://www.dtoken1.eth")
+    assert.equal(trim(utils.toAscii(tokenInfo1[5])), "support@dtoken1.eth")
 
-    assert.equal(trim(web3.toAscii(tokenInfo2[0])), "Dummy Token 2")
-    assert.equal(trim(web3.toAscii(tokenInfo2[1])), "DT2")
+    assert.equal(trim(utils.toAscii(tokenInfo2[0])), "Dummy Token 2")
+    assert.equal(trim(utils.toAscii(tokenInfo2[1])), "DT2")
     assert.equal(tokenInfo2[2], dt2.address)
     assert.equal(tokenInfo2[3].toNumber(), 6)
-    assert.equal(trim(web3.toAscii(tokenInfo2[4])), "http://www.dtoken2.eth")
-    assert.equal(trim(web3.toAscii(tokenInfo2[5])), "support@dtoken2.eth")
+    assert.equal(trim(utils.toAscii(tokenInfo2[4])), "http://www.dtoken2.eth")
+    assert.equal(trim(utils.toAscii(tokenInfo2[5])), "support@dtoken2.eth")
   })
 
   it("should fail to register a token from other addresses", async function() {

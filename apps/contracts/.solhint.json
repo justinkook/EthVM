@@ -4,7 +4,8 @@
   "rules": {
     "avoid-throw": false,
     "avoid-suicide": "error",
-    "avoid-sha3": "warn",
-    "no-inline-assembly": false
+    "avoid-sha3": "error",
+    "no-inline-assembly": false,
+    "indent": 4
   }
 }
