@@ -39,7 +39,7 @@ contract PublicTokens {
         _;
     }
 
-    modifier no_null(address addr) {
+    modifier noNull(address addr) {
         require(addr != address(0), "invalid address");
         _;
     }
@@ -63,7 +63,7 @@ contract PublicTokens {
         uint8 decimals,
         bytes32 website,
         bytes32 email
-    ) public onlyMod no_null(addr) onlyContract(addr) {
+    ) public onlyMod noNull(addr) onlyContract(addr) {
         Token storage token = pubTokens[idMap[addr]];
         if (token.addr == address(0)) {
             tokenCount++;
@@ -80,7 +80,7 @@ contract PublicTokens {
         token.email = email;
     }
 
-    function disableToken(address addr) public onlyMod no_null(addr) {
+    function disableToken(address addr) public onlyMod noNull(addr) {
         Token storage token = pubTokens[idMap[addr]];
         if (token.addr == addr) {
             token.isValid = false;
@@ -88,7 +88,7 @@ contract PublicTokens {
         }
     }
 
-    function enableToken(address addr) public onlyMod no_null(addr) {
+    function enableToken(address addr) public onlyMod noNull(addr) {
         Token storage token = pubTokens[idMap[addr]];
         if (token.addr == addr) {
             token.isValid = false;

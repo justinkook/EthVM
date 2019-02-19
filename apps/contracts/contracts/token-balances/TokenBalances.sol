@@ -28,6 +28,7 @@ contract TokenBalances is Seriality {
 
     function getTokenBalance(address tokenAddr, address addr) public view returns (uint bal) {
         bytes4 sig = bytes4(keccak256("balanceOf(address)"));
+
         assembly {
             // move pointer to free memory spot
             let ptr := mload(0x40)
@@ -38,10 +39,9 @@ contract TokenBalances is Seriality {
             // append argument after function sig
             mstore(add(ptr, 0x04), addr)
 
-            let result := call(
+            let result := staticcall(
                 150000,    // gas limit
                 tokenAddr, // to addr. append var to _slot to access storage variable
-                0,         // not transfer any ether
                 ptr,       // Inputs are stored at location ptr
                 0x24,      // Inputs are 36 bytes long
                 ptr,       // Store output over input
