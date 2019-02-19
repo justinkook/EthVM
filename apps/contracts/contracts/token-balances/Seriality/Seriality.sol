@@ -6,11 +6,10 @@ pragma solidity ^0.5.0;
  * @author pouladzade@gmail.com
  */
 
-import "./BytesToTypes.sol";
 import "./TypesToBytes.sol";
 
 
-contract Seriality is BytesToTypes, TypesToBytes {
+contract Seriality is TypesToBytes {
 
     constructor() public {
 

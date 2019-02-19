@@ -45,12 +45,6 @@ contract TypesToBytes {
         }
     }
 
-    function intToBytes(uint _offst, int _input, bytes memory  _output) internal pure {
-        assembly {
-            mstore(add(_output, _offst), _input)
-        }
-    }
-
     function uintToBytes(uint _offst, uint _input, bytes memory _output) internal pure {
         assembly {
             mstore(add(_output, _offst), _input)
@@ -72,6 +66,5 @@ contract TypesToBytes {
             }
         }
     }
-
 
 }
