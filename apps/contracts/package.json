@@ -12,6 +12,7 @@
     "web3": "^1.0.0-beta.41"
   },
   "scripts": {
+    "install": "docker pull ethereum/solc:0.5.4",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

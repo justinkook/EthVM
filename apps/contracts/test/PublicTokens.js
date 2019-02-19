@@ -5,15 +5,10 @@ const DummyToken = artifacts.require("DummyToken")
 const DummyContract = artifacts.require("DummyContract")
 
 var utils = require('web3-utils')
-const bd = require("./bd.js")
+const decode = require("./decoder.js")
 
-function trim(str) {
-  return str.replace(/\0[\s\S]*$/g, "")
-}
-
-let getHex = str => {
-  return "0x" + Buffer.from(str, "utf8").toString("hex")
-}
+let trim = str => str.replace(/\0[\s\S]*$/g, "")
+let getHex = str => "0x" + Buffer.from(str, "utf8").toString("hex")
 
 contract("PublicTokens", function(accounts) {
   let pt = null
@@ -56,12 +51,12 @@ contract("PublicTokens", function(accounts) {
     )
 
     await pt.addSetToken(
-      "Dummy Token 2",
-      "DT2",
+      getHex("Dummy Token 2"),
+      getHex("DT2"),
       dt2.address,
       6,
-      "http://www.dtoken2.eth",
-      "support@dtoken2.eth",
+      getHex("http://www.dtoken2.eth"),
+      getHex("support@dtoken2.eth"),
       {
         from: accounts[0]
       }
@@ -88,12 +83,12 @@ contract("PublicTokens", function(accounts) {
   it("should fail to register a token from other addresses", async function() {
     try {
       await pt.addSetToken(
-        "Dummy Token 3",
-        "DT3",
+        getHex("Dummy Token 3"),
+        getHex("DT3"),
         dt3.address,
         7,
-        "http://www.dtoken3.eth",
-        "support@dtoken3.eth",
+        getHex("http://www.dtoken3.eth"),
+        getHex("support@dtoken3.eth"),
         {
           from: accounts[1]
         }
@@ -112,7 +107,7 @@ contract("PublicTokens", function(accounts) {
 
   it("should get correct encoded string", async function() {
     let allBalance = await tb.getAllBalance(accounts[1], true, true, true, 0)
-    let tokens = bd.decode(allBalance)
+    let tokens = decode(allBalance)
 
     assert.equal(tokens.length, 2)
     assert.equal(tokens[0].balance, 500000000000000)
@@ -124,7 +119,7 @@ contract("PublicTokens", function(accounts) {
     await dt2.killMe()
 
     let allBalance = await tb.getAllBalance(accounts[1], true, true, true, 0)
-    let tokens = bd.decode(allBalance)
+    let tokens = decode(allBalance)
 
     assert.equal(tokens.length, 1)
     assert.equal(tokens[0].balance, 500000000000000)
@@ -133,19 +128,19 @@ contract("PublicTokens", function(accounts) {
 
   it("set random contract and should still work", async function() {
     await pt.addSetToken(
-      "Dummy Contract",
-      "DC",
+      getHex("Dummy Contract"),
+      getHex("DC"),
       dc.address,
       6,
-      "http://www.dcontract.eth",
-      "support@dcontract.eth",
+      getHex("http://www.dcontract.eth"),
+      getHex("support@dcontract.eth"),
       {
         from: accounts[0]
       }
     )
 
     let allBalance = await tb.getAllBalance(accounts[1], true, true, true, 0)
-    let tokens = bd.decode(allBalance)
+    let tokens = decode(allBalance)
 
     assert.equal(tokens.length, 2)
     assert.equal(tokens[0].balance, 500000000000000)

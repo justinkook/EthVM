@@ -1,7 +1,7 @@
 var BN = require('bignumber.js')
 var utils = require('web3-utils')
 
-module.exports = hex => {
+const decode = hex => {
   const tokens = []
 
   const sizeHex = bytes => bytes * 2
@@ -66,3 +66,5 @@ module.exports = hex => {
 
   return tokens
 }
+
+module.exports = decode
