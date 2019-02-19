@@ -56,7 +56,7 @@ contract PublicTokens {
         moderator[addr] = false;
     }
 
-    function addSetToken(
+    function addToken(
         bytes16 name,
         bytes16 symbol,
         address addr,

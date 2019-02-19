@@ -16,17 +16,17 @@ contract TokenBalances is Seriality {
         bool isValid;    // whether the token is valid or not
     }
 
-    PublicTokens private pubT;
+    PublicTokens private tokens;
 
     constructor(address tokenStorage) public {
-        pubT = PublicTokens(tokenStorage);
+        tokens = PublicTokens(tokenStorage);
     }
 
     function getTokenStorage() public view returns (address) {
-        return address(pubT);
+        return address(tokens);
     }
 
-    function getTokenBalance(address tokenAddr, address addr) public view returns (uint bal) {
+    function getTokenBalanceOf(address tokenAddr, address addr) public view returns (uint bal) {
         bytes4 sig = bytes4(keccak256("balanceOf(address)"));
 
         assembly {
@@ -60,28 +60,27 @@ contract TokenBalances is Seriality {
         }
     }
 
-    function getAllBalance(
+    function getAllTokenBalances(
         address _owner,
         bool name,
         bool website,
         bool email,
-        uint _count
+        uint page,
+        uint limit
     ) public view returns (bytes memory) {
-        uint count;
+        assert(limit > 0);
+
+        uint start = page * limit;
+        assert(start < tokens.tokenCount());
+
+        // Assert that values are in range
+
         address tOwner = _owner;
-
-        if (_count == 0) {
-            count = pubT.tokenCount();
-        } else {
-            count = _count;
-        }
-
-        bool[] memory validTokens = new bool[](count + 1);
-        uint bufferSize = 33; // assign 32 bytes to set the total number of tokens + define start
-        bufferSize += 3;      // set name, website, email
+        bool[] memory validTokens = new bool[](limit + 1);
+        uint bufferSize = 36; // 32 bytes total number of tokens + 1 byte to define start + 3 bytes to name, website, email
         uint countValidTokens = 0;
 
-        for (uint i = 1; i <= count; i++) {
+        for (uint i = start; i <= tokens.tokenCount(); i++) {
             Token memory token = getToken(i);
             if (token.isValid && isContract(token.addr)) {
                 validTokens[i] = true;
@@ -92,6 +91,9 @@ contract TokenBalances is Seriality {
                 bufferSize += 69; // address (20) + symbol(16) + balance(32) + decimals(1)
             } else {
                 validTokens[i] = false;
+            }
+            if (countValidTokens == limit) {
+                break;
             }
         }
 
@@ -110,7 +112,7 @@ contract TokenBalances is Seriality {
         boolToBytes(offset, email, result);
         offset -= 1;
 
-        for (uint i = 1; i <= count; i++) {
+        for (uint i = 0; i < validTokens.length; i++) {
             if (!validTokens[i]) {
                 continue;
             }
@@ -123,7 +125,7 @@ contract TokenBalances is Seriality {
             offset -= 20;
             uintToBytes(offset, token.decimals, result);
             offset -= 1;
-            uintToBytes(offset, getTokenBalance(token.addr, tOwner), result);
+            uintToBytes(offset, getTokenBalanceOf(token.addr, tOwner), result);
             offset -= 32;
             if (name) {
                 bytes16ToBytesR(offset, token.name, result);
@@ -151,7 +153,7 @@ contract TokenBalances is Seriality {
             token.website,
             token.email,
             token.isValid
-        ) = pubT.pubTokens(id);
+        ) = tokens.pubTokens(id);
     }
 
     function isContract(address addr) internal view returns (bool) {
