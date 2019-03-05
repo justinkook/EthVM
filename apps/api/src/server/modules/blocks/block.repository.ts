@@ -45,7 +45,7 @@ export class MongoBlockRepository extends BaseMongoDbRepository implements Block
     return this.db
       .collection(MongoEthVM.collections.blocks)
       .find({ 'header.author': address })
-      .sort({ number: -1 })
+      .sort({ _id: -1 })
       .skip(start)
       .limit(limit)
       .toArray()

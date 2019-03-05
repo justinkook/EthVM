@@ -57,7 +57,7 @@ export class ExchangeRepositoryImpl extends BaseMongoDbRepository implements Exc
     }
     return this.db
       .collection(MongoEthVM.collections.tokenExchangeRates)
-      .find({})
+      .find()
       .sort(sort)
       .skip(start)
       .limit(limit)
