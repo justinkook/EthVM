@@ -33,7 +33,9 @@ const indexes = {
   token_exchange_rates: [
     { key: { address: 1 }, options: { unique: true } },
     { key: { market_cap_rank: 1 } },
-    { key: { timestamp: 1 } }
+    { key: { current_price: -1 } },
+    { key: { total_volume: -1 } },
+    { key: { market_cap: -1 } },
   ],
 
   transactions: [
