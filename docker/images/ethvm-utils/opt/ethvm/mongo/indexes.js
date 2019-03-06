@@ -11,9 +11,8 @@ const indexes = {
   ],
 
   blocks: [
-    { key: { "header.hash": 1 }, options: { unique: true } },
-    { key: { "header.author": 1 } },
-    { key: { "header.timestamp": 1 } }
+    { key: { "header.author": 1, _id: -1 } },
+    { key: { "header.hash": 1 }, options: { unique: true } }
   ],
 
   block_metrics: [
@@ -38,13 +37,6 @@ const indexes = {
   ],
 
   transactions: [
-    // { key: { blockHash: 1 } },
-    // { key: { blockNumber: 1 } },
-    // { key: { from: 1 } },
-    // { key: { to: 1 } },
-    // { key: { from: 1, to: 1 } },
-    // { key: { timestamp: -1 } },
-
     { key: { hash: 1 } },
     { key: { blockHash: 1 } },
     { key: { from: 1, to: 1, timestamp: -1 } },
