@@ -27,6 +27,7 @@ const indexes = {
   ],
 
   token_transfers: [
+    { key: { contract: 1, transferType: 1, timestamp: -1 } },
     { key: { contract: 1, transferType: 1, from: 1, to: 1, timestamp: -1 } }
   ],
 
@@ -42,7 +43,8 @@ const indexes = {
     { key: { hash: 1 } },
     { key: { blockHash: 1 } },
     { key: { from: 1, to: 1, timestamp: -1 } },
-    { key: { blockNumber: -1, index: -1, timestamp: -1 } }
+    { key: { blockNumber: -1, index: -1, timestamp: -1 } },
+    { key: { blockNumber: 1, index: -1, timestamp: -1 } }
   ],
 
   uncles: [
